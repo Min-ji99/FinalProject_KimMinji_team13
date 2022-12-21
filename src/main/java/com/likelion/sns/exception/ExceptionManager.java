@@ -19,7 +19,6 @@ public class ExceptionManager {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> appExceptionHandler(AppException e){
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(Response.error(new ErrorResponse(e.getErrorCode().name(), e.getMessage())));
-
+                .body(Response.error(new ErrorResponse(e.getErrorCode(), e.getMessage())));
     }
 }

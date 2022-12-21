@@ -42,6 +42,7 @@ class UserRestControllerTest {
     @DisplayName("회원가입 성공")
     @WithMockUser
     void join_success() throws Exception {
+        //when(userService.join(any())).thenReturn(mock(UserJoinResponse.class));
         mockMvc.perform(post("/api/v1/users/join")
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)

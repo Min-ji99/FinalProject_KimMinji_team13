@@ -1,5 +1,6 @@
 package com.likelion.sns.domain.dto;
 
+import com.likelion.sns.enums.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ErrorResponse {
-    private String errorCode;
+    private ErrorCode errorCode;
     private String message;
 }
