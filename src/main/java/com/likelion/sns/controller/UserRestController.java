@@ -1,8 +1,6 @@
 package com.likelion.sns.controller;
 
-import com.likelion.sns.domain.dto.Response;
-import com.likelion.sns.domain.dto.UserJoinRequest;
-import com.likelion.sns.domain.dto.UserJoinResponse;
+import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,5 +21,10 @@ public class UserRestController {
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest dto){
         UserJoinResponse userJoinResponse=userService.join(dto);
         return Response.success(userJoinResponse);
+    }
+    @PostMapping("/login")
+    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest dto){
+        UserLoginResponse userLoginResponse=userService.login(dto);
+        return Response.success(userLoginResponse);
     }
 }
