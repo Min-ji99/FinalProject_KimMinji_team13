@@ -9,3 +9,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+jwt:
+  token:
+    secret: hello
