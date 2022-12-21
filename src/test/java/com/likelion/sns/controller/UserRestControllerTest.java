@@ -1,9 +1,7 @@
 package com.likelion.sns.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.likelion.sns.domain.dto.Response;
-import com.likelion.sns.domain.dto.UserJoinRequest;
-import com.likelion.sns.domain.dto.UserJoinResponse;
+import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.UserService;
@@ -37,6 +35,10 @@ class UserRestControllerTest {
             .userName("minji")
             .password("1234")
             .build();
+    UserLoginRequest userLoginRequest=UserLoginRequest.builder()
+            .userName("minji")
+            .password("1234")
+            .build();
 
     @Test
     @DisplayName("회원가입 성공")
@@ -63,5 +65,46 @@ class UserRestControllerTest {
                 .content(objectMapper.writeValueAsBytes(userJoinRequest)))
                 .andDo(print())
                 .andExpect(status().isConflict());
+    }
+    @Test
+    @DisplayName("로그인 실패 - username이 존재하지 않는 경우")
+    @WithMockUser
+    void login_fail1() throws Exception{
+
+        when(userService.login(any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s이 존재하지 않습니다.", userLoginRequest.getUserName())));
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    @DisplayName("로그인 실패 - password 오류")
+    @WithMockUser
+    void login_fail2() throws Exception{
+
+        when(userService.login(any())).thenThrow(new AppException(ErrorCode.INVALID_PASSWORD, String.format("Username 또는 password가 잘못되었습니다.")));
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("로그인 성공")
+    @WithMockUser
+    void login_success() throws Exception{
+        //when(userService.login(any())).thenReturn(mock(UserLoginResponse.class));
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(userLoginRequest)))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
