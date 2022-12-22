@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -17,7 +18,7 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/users/join").permitAll()
+                .antMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
