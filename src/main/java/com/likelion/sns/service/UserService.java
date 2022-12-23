@@ -52,4 +52,10 @@ public class UserService {
                 .token(JwtTokenUtil.createToken(dto.getUserName(), secretKey, expireTimeMs))
                 .build();
     }
+
+    public User getUsername(String userName) {
+        User user=userRepository.findByUserName(userName)
+                .orElseThrow(()-> new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s가 존재하지 않습니다.", userName)));
+        return user;
+    }
 }

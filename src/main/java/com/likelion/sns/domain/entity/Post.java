@@ -1,23 +1,26 @@
 package com.likelion.sns.domain.entity;
 
-import com.likelion.sns.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Builder
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
+@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class User extends BaseEntity{
+public class Post extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String userName;
-    private String password;
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private String title;
+    private String body;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 }
