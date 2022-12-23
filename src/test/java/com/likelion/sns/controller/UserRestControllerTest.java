@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(UserRestController.class)
 class UserRestControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -44,7 +44,9 @@ class UserRestControllerTest {
     @DisplayName("회원가입 성공")
     @WithMockUser
     void join_success() throws Exception {
-        //when(userService.join(any())).thenReturn(mock(UserJoinResponse.class));
+        UserJoinResponse userJoinResponse=UserJoinResponse.builder().userId(0).userName("minji").build();
+        when(userService.join(any())).thenReturn(userJoinResponse);
+
         mockMvc.perform(post("/api/v1/users/join")
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +100,9 @@ class UserRestControllerTest {
     @DisplayName("로그인 성공")
     @WithMockUser
     void login_success() throws Exception{
-        //when(userService.login(any())).thenReturn(mock(UserLoginResponse.class));
+        UserLoginResponse userLoginResponse=UserLoginResponse.builder().token("token").build();
+
+        when(userService.login(any())).thenReturn(userLoginResponse);
 
         mockMvc.perform(post("/api/v1/users/login")
                         .with(csrf())
