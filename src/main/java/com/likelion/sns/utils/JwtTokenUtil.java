@@ -17,7 +17,7 @@ public class JwtTokenUtil {
 
     public JwtTokenUtil(@Value("${jwt.token.secret}")String secretKey) {
         this.secretKey = secretKey;
-        this.expireTimeMs = 1000*60;
+        this.expireTimeMs = 1000*60*60;
     }
 
     public String createToken(String userName){
