@@ -9,22 +9,18 @@ import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.UserRepository;
 import com.likelion.sns.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-
     private final BCryptPasswordEncoder encoder;
-
-    @Value("${jwt.token.secret}")
-    private String secretKey;
-    private long expireTimeMs=1000*60*60;
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
+    private final JwtTokenUtil jwtTokenUtil;
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder, JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     public UserJoinResponse join(UserJoinRequest dto) {
@@ -49,7 +45,7 @@ public class UserService {
         }
 
         return UserLoginResponse.builder()
-                .token(JwtTokenUtil.createToken(dto.getUserName(), secretKey, expireTimeMs))
+                .token(jwtTokenUtil.createToken(dto.getUserName()))
                 .build();
     }
 

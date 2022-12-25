@@ -1,5 +1,6 @@
 package com.likelion.sns.service;
 
+import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostWriteRequest;
 import com.likelion.sns.domain.dto.PostWriteResponse;
 import com.likelion.sns.domain.entity.Post;
@@ -8,6 +9,8 @@ import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.PostRepository;
 import com.likelion.sns.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,5 +32,12 @@ public class PostService {
                 .message("포스트 등록 완료")
                 .postId(post.getId())
                 .build();
+    }
+
+    public Page<PostDto> getList(Pageable pageable) {
+        Page<Post> posts=postRepository.findAll(pageable);
+        Page<PostDto> postResponses= PostDto.toList(posts);
+
+        return postResponses;
     }
 }
