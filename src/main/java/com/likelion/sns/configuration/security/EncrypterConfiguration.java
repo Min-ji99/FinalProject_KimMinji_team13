@@ -1,4 +1,4 @@
-package com.likelion.sns.configuration;
+package com.likelion.sns.configuration.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
