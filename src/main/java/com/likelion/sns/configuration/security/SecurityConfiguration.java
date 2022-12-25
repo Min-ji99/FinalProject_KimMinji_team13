@@ -1,30 +1,27 @@
-package com.likelion.sns.configuration;
+package com.likelion.sns.configuration.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.sns.service.UserService;
+import com.likelion.sns.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.firewall.DefaultHttpFirewall;
-import org.springframework.security.web.firewall.HttpFirewall;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final UserService userService;
-    @Value("${jwt.token.secret}")
-    private String secretKey;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedEntryPoint customAccessDeniedEntryPoint;
+    private final JwtTokenUtil jwtTokenUtil;
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -32,14 +29,17 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
+                .antMatchers("/swagger-resources/**", "/swagger-ui/**", "/swagger/**", "/webjars/**").permitAll()
+                .antMatchers("/api/v1/hello", "/api/v1/users/join", "/api/v1/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/posts").authenticated()
+                .and()
+                .exceptionHandling().accessDeniedHandler(customAccessDeniedEntryPoint)
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenFilter(userService, jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
