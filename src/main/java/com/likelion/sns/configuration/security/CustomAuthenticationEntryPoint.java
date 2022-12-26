@@ -18,8 +18,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-
-        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INVALID_TOKEN, "사용자가 권한이 없습니다.");
+        ErrorCode exception=(ErrorCode) request.getAttribute("exception");
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INVALID_TOKEN, "잘못된 토큰입니다.");
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
