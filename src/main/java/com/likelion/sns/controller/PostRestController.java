@@ -1,9 +1,6 @@
 package com.likelion.sns.controller;
 
-import com.likelion.sns.domain.dto.PostDto;
-import com.likelion.sns.domain.dto.PostWriteRequest;
-import com.likelion.sns.domain.dto.PostWriteResponse;
-import com.likelion.sns.domain.dto.Response;
+import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.PostService;
@@ -42,5 +39,10 @@ public class PostRestController {
     public Response<PostDto> findPostById(@PathVariable Integer id){
         PostDto post=postService.findPostById(id);
         return Response.success(post);
+    }
+    @PutMapping("/{id}")
+    public Response<PostWriteResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, Authentication authentication){
+        PostWriteResponse postWriteResponse=postService.modify(id, dto, authentication.getName());
+        return Response.success(postWriteResponse);
     }
 }
