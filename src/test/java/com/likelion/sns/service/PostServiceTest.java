@@ -1,5 +1,6 @@
 package com.likelion.sns.service;
 
+import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostWriteRequest;
 import com.likelion.sns.domain.dto.PostWriteResponse;
 import com.likelion.sns.domain.entity.Post;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,5 +54,27 @@ class PostServiceTest {
         assertEquals(postWriteResponse.getMessage(), "포스트 등록 완료");
 
         verify(postRepository).save(any());
+    }
+    @Test
+    @DisplayName("포스트 상세 조회 성공")
+    void findPostById_success(){
+        Post post=Post.builder()
+                .id(1)
+                .title("Title")
+                .body("Body")
+                .user(User.builder().id(1).userName("minji").password("1234").build())
+                .build();
+        Mockito.when(postRepository.findById(1)).thenReturn(Optional.of(post));
+
+        PostDto postDto=postService.findPostById(1);
+
+        assertEquals(postDto.getId(), post.getId());
+        assertEquals(postDto.getTitle(), post.getTitle());
+    }
+    @Test
+    @DisplayName("포스트 상세 조회 실패 - postId가 존재하지 않을때")
+    void findPostById_fail(){
+        Mockito.when(postRepository.findById(1)).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
+        Assertions.assertThatThrownBy(()->postService.findPostById(1));
     }
 }
