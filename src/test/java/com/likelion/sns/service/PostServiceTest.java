@@ -3,7 +3,7 @@ package com.likelion.sns.service;
 import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostModifyRequet;
 import com.likelion.sns.domain.dto.PostWriteRequest;
-import com.likelion.sns.domain.dto.PostWriteResponse;
+import com.likelion.sns.domain.dto.PostResponse;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
@@ -14,10 +14,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,10 +70,10 @@ class PostServiceTest {
         Mockito.when(userRepository.findByUserName(USER1.getUserName())).thenReturn(Optional.of(USER1));
         Mockito.when(postRepository.save(any())).thenReturn(POST);
 
-        PostWriteResponse postWriteResponse=postService.write(postWriteRequest, USER1.getUserName());
+        PostResponse postResponse =postService.write(postWriteRequest, USER1.getUserName());
 
-        assertEquals(postWriteResponse.getPostId(), USER1.getId());
-        assertEquals(postWriteResponse.getMessage(), "포스트 등록 완료");
+        assertEquals(postResponse.getPostId(), USER1.getId());
+        assertEquals(postResponse.getMessage(), "포스트 등록 완료");
 
         verify(postRepository).save(any());
     }
@@ -117,5 +115,20 @@ class PostServiceTest {
         Mockito.when(userRepository.findByUserName(USER2.getUserName())).thenReturn(Optional.of(USER2));
         AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER2.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.INVALID_PERMISSION);
+    }
+    @Test
+    @DisplayName("포스트 삭제 - 유저가 존재하지 않을 때 ")
+    void delete_fail_no_user(){
+        Mockito.when(postRepository.findById(POST.getId())).thenReturn(Optional.of(POST));
+        Mockito.when(userRepository.findByUserName(any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND, ""));
+        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        assertEquals(appException.getErrorCode(), ErrorCode.USERNAME_NOT_FOUND);
+    }
+    @Test
+    @DisplayName("포스트 삭제 - 포스트 존재하지 않을 때")
+    void delete_fail_no_post(){
+        Mockito.when(postRepository.findById(POST.getId())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
+        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        assertEquals(appException.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
 }

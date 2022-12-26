@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostModifyRequet;
 import com.likelion.sns.domain.dto.PostWriteRequest;
-import com.likelion.sns.domain.dto.PostWriteResponse;
-import com.likelion.sns.domain.entity.Post;
+import com.likelion.sns.domain.dto.PostResponse;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,12 +46,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 작성 성공")
     @WithMockUser
     void write_success() throws Exception {
-        PostWriteResponse postWriteResponse= PostWriteResponse.builder()
+        PostResponse postResponse = PostResponse.builder()
                 .postId(0)
                 .message("포스트 등록 완료")
                 .build();
 
-        when(postService.write(any(), any())).thenReturn(postWriteResponse);
+        when(postService.write(any(), any())).thenReturn(postResponse);
 
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
@@ -113,11 +110,11 @@ class PostRestControllerTest {
                 .body("modify body")
                 .build();
 
-        PostWriteResponse postWriteResponse=PostWriteResponse.builder()
+        PostResponse postResponse = PostResponse.builder()
                 .postId(1)
                 .message("포스트 수정 완료")
                 .build();
-        when(postService.modify(any(), any(), any())).thenReturn(postWriteResponse);
+        when(postService.modify(any(), any(), any())).thenReturn(postResponse);
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -193,6 +190,56 @@ class PostRestControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(postModifyRequet)))
+                .andDo(print())
+                .andExpect(status().isInternalServerError());
+    }
+    @Test
+    @DisplayName("포스트 삭제 성공")
+    @WithMockUser
+    void delete_success() throws Exception {
+        PostResponse postResponse = PostResponse.builder()
+                .postId(1)
+                .message("포스트 삭제 완료")
+                .build();
+        when(postService.delete(any(), any())).thenReturn(postResponse);
+
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.message").value("포스트 삭제 완료"))
+                .andExpect(jsonPath("$.result.postId").exists());
+    }
+    @Test
+    @DisplayName("포스트 삭제 실패 - 인증 실패")
+    @WithAnonymousUser
+    void delete_fail1() throws Exception {
+        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 삭제 실패 - 작성자 불일치")
+    @WithAnonymousUser
+    void delete_fail2() throws Exception {
+        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 수정 실패 - DB 에러")
+    @WithMockUser
+    void delete_fail3() throws Exception {
+        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
+
+        mockMvc.perform(put("/api/v1/posts/1")
+                        .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
     }

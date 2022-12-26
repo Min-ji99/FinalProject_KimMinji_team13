@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .antMatchers("/api/v1/hello", "/api/v1/users/join", "/api/v1/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/posts").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/v1/posts/**").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/v1/posts/**").authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedEntryPoint)
                 .authenticationEntryPoint(customAuthenticationEntryPoint)

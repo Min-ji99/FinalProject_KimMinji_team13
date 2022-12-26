@@ -1,8 +1,6 @@
 package com.likelion.sns.controller;
 
 import com.likelion.sns.domain.dto.*;
-import com.likelion.sns.enums.ErrorCode;
-import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,10 +22,10 @@ public class PostRestController {
     }
 
     @PostMapping
-    public Response<PostWriteResponse> write(@RequestBody PostWriteRequest dto, Authentication authentication){
+    public Response<PostResponse> write(@RequestBody PostWriteRequest dto, Authentication authentication){
         log.info("controller : {}", authentication);
-        PostWriteResponse postWriteResponse=postService.write(dto, authentication.getName());
-        return Response.success(postWriteResponse);
+        PostResponse postResponse =postService.write(dto, authentication.getName());
+        return Response.success(postResponse);
     }
     @GetMapping
     public Response<Page<PostDto>> getPostlist(@PageableDefault(size=20)
@@ -41,8 +39,13 @@ public class PostRestController {
         return Response.success(post);
     }
     @PutMapping("/{id}")
-    public Response<PostWriteResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, Authentication authentication){
-        PostWriteResponse postWriteResponse=postService.modify(id, dto, authentication.getName());
-        return Response.success(postWriteResponse);
+    public Response<PostResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, Authentication authentication){
+        PostResponse postResponse =postService.modify(id, dto, authentication.getName());
+        return Response.success(postResponse);
+    }
+    @DeleteMapping("/{id}")
+    public Response<PostResponse> delete(@PathVariable Integer id, Authentication authentication){
+        PostResponse postResponse=postService.delete(id, authentication.getName());
+        return Response.success(postResponse);
     }
 }
