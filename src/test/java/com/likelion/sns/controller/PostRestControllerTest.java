@@ -1,6 +1,7 @@
 package com.likelion.sns.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostWriteRequest;
 import com.likelion.sns.domain.dto.PostWriteResponse;
 import com.likelion.sns.domain.entity.Post;
@@ -18,12 +19,14 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,5 +76,31 @@ class PostRestControllerTest {
                         .content(objectMapper.writeValueAsBytes(postWriteRequest)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("포스트 상세 조회 - id, title, body, userName 존재")
+    @WithMockUser
+    void getPostById_success() throws Exception{
+        PostDto postDto= PostDto.builder()
+                .id(1)
+                .title("Title")
+                .body("Body")
+                .userName("minji")
+                .createdAt(LocalDateTime.now())
+                .lastModifiedAt(LocalDateTime.now())
+                .build();
+
+        when(postService.findPostById(any())).thenReturn(postDto);
+
+        mockMvc.perform(get("/api/v1/posts/1")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.id").exists())
+                .andExpect(jsonPath("$.result.title").exists())
+                .andExpect(jsonPath("$.result.userName").exists())
+                .andExpect(jsonPath("$.result.body").exists())
+                .andExpect(jsonPath("$.result.createdAt").exists())
+                .andExpect(jsonPath("$.result.lastModifiedAt").exists());
     }
 }

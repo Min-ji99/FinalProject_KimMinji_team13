@@ -34,10 +34,23 @@ public class PostService {
                 .build();
     }
 
-    public Page<PostDto> getList(Pageable pageable) {
+    public Page<PostDto> getPostlist(Pageable pageable) {
         Page<Post> posts=postRepository.findAll(pageable);
         Page<PostDto> postResponses= PostDto.toList(posts);
 
         return postResponses;
+    }
+
+    public PostDto findPostById(Integer id) {
+        Post post=postRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .body(post.getBody())
+                .userName(post.getUser().getUserName())
+                .createdAt(post.getCreatedAt())
+                .lastModifiedAt(post.getLastModifiedAt())
+                .build();
     }
 }

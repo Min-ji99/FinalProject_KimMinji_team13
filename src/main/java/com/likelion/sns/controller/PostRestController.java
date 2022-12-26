@@ -33,9 +33,14 @@ public class PostRestController {
         return Response.success(postWriteResponse);
     }
     @GetMapping
-    public Response<Page<PostDto>> list(@PageableDefault(size=20)
+    public Response<Page<PostDto>> getPostlist(@PageableDefault(size=20)
                                             @SortDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable){
-        Page<PostDto> posts=postService.getList(pageable);
+        Page<PostDto> posts=postService.getPostlist(pageable);
         return Response.success(posts);
+    }
+    @GetMapping("/{id}")
+    public Response<PostDto> findPostById(@PathVariable Integer id){
+        PostDto post=postService.findPostById(id);
+        return Response.success(post);
     }
 }
