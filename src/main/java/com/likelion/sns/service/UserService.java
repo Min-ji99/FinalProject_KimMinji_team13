@@ -45,7 +45,7 @@ public class UserService {
         }
 
         return UserLoginResponse.builder()
-                .token(jwtTokenUtil.createToken(dto.getUserName()))
+                .jwt(jwtTokenUtil.createToken(dto.getUserName()))
                 .build();
     }
 

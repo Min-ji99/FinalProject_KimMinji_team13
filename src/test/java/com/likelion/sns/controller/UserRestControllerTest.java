@@ -100,7 +100,7 @@ class UserRestControllerTest {
     @DisplayName("로그인 성공")
     @WithMockUser
     void login_success() throws Exception{
-        UserLoginResponse userLoginResponse=UserLoginResponse.builder().token("token").build();
+        UserLoginResponse userLoginResponse=UserLoginResponse.builder().jwt("token").build();
 
         when(userService.login(any())).thenReturn(userLoginResponse);
 
