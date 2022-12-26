@@ -35,7 +35,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String header=request.getHeader(HttpHeaders.AUTHORIZATION);
         log.info("authorization : {}", header);
-        if(header == null || !header.startsWith("Bearer ")){
+
+        if(header == null){
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "토큰이 존재하지 않습니다.");
+            request.setAttribute("exception", errorResponse);
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if(!header.startsWith("Bearer ")){
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "Bearer Token이 아닙니다.");
+            request.setAttribute("exception", errorResponse);
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,6 +57,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(), null, List.of(new SimpleGrantedAuthority(user.getRole().name())));
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }else{
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "유효하지 않은 token 입니다.");
+            request.setAttribute("exception", errorResponse);
         }
         filterChain.doFilter(request, response);
     }
