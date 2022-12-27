@@ -25,6 +25,7 @@ public class PostService {
     }
 
     public PostResponse write(PostWriteRequest dto, String userName) {
+        //userName이 존재하지 않으면 USERNAME_NOT_FOUND 예외 발생
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
 
@@ -43,6 +44,7 @@ public class PostService {
     }
 
     public PostDto findPostById(Integer id) {
+        //postId가 존재하지 않으면 POST_NOT_FOUND 예외발생
         Post post=postRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
         return PostDto.builder()
@@ -56,11 +58,15 @@ public class PostService {
     }
 
     public PostResponse modify(Integer id, PostModifyRequet dto, String userName) {
+        //존재하는 Post인지 확인
         Post post=postRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
 
+        //존재하는 유저인지 확인
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
+
+        //post 작성자와 유저가 일치하는지 확인
         if(user.getId()!=post.getUser().getId()){
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
         }
@@ -70,16 +76,19 @@ public class PostService {
 
         return PostResponse.builder()
                 .message("포스트 수정 완료")
-                .postId(post.getId())
+                .postId(savedPost.getId())
                 .build();
     }
 
     public PostResponse delete(Integer id, String userName) {
+        //존재하는 Post인지 확인
         Post post=postRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
 
+        //존재하는 유저인지 확인
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
+        //post 작성자와 유저가 일치하는지 확인
         if(user.getId()!=post.getUser().getId()){
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
         }

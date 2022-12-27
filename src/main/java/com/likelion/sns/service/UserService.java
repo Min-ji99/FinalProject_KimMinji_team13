@@ -22,6 +22,7 @@ public class UserService {
     }
 
     public UserJoinResponse join(UserJoinRequest dto) {
+        //userName이 중복되는지 확인
         userRepository.findByUserName(dto.getUserName())
                 .ifPresent(user->{
                     throw new AppException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s는 존재하는 이름입니다.", dto.getUserName()));
@@ -35,9 +36,11 @@ public class UserService {
     }
 
     public UserLoginResponse login(UserLoginRequest dto) {
+        //존재하는 유저인지 확인
         User user=userRepository.findByUserName(dto.getUserName())
                 .orElseThrow(()-> new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s이 존재하지 않습니다.", dto.getUserName())));
 
+        //password가 일치하는지 확인
         if(!encoder.matches(dto.getPassword(), user.getPassword())){
             throw new AppException(ErrorCode.INVALID_PASSWORD, String.format("Username 또는 password가 잘못되었습니다."));
         }
@@ -54,10 +57,13 @@ public class UserService {
     }
 
     public UserRoleChangeResponse changeRole(UserRoleChangeRequest dto, Integer id, String adminUserName) {
+        //admin 사용자가 존재하는지 확인
         User admin=userRepository.findByUserName(adminUserName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s이 존재하지 않습니다.", adminUserName)));
+        //권한을 변경시킬 사용자가 존재하는지 확인
         User user=userRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("userId %d이 존재하지 않습니다.", id)));
+
         user.setRole(UserRole.of(dto.getRole()));
         User savedUser=userRepository.save(user);
         return UserRoleChangeResponse.builder()
