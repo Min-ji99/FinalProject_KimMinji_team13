@@ -5,6 +5,7 @@ import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.dto.PostModifyRequet;
 import com.likelion.sns.domain.dto.PostWriteRequest;
 import com.likelion.sns.domain.dto.PostResponse;
+import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.PostService;
@@ -75,6 +76,19 @@ class PostRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
+
+    /*
+    @Test
+    @DisplayName("포스트 리스트 조회 - createdAt 기준으로 정렬되어있는지 확인")
+    @WithMockUser
+    void getPostList() throws Exception{
+        mockMvc.perform(get("/api/v1/posts")
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "createdAt,desc"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }*/
     @Test
     @DisplayName("포스트 상세 조회 - id, title, body, userName 존재")
     @WithMockUser
@@ -233,7 +247,7 @@ class PostRestControllerTest {
                 .andExpect(status().isUnauthorized());
     }
     @Test
-    @DisplayName("포스트 수정 실패 - DB 에러")
+    @DisplayName("포스트 삭제 실패 - DB 에러")
     @WithMockUser
     void delete_fail3() throws Exception {
         when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
