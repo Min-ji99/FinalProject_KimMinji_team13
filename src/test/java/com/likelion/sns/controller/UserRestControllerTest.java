@@ -2,17 +2,26 @@ package com.likelion.sns.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
+import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.service.UserService;
+import com.likelion.sns.utils.JwtTokenUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -20,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserRestController.class)
@@ -30,21 +40,48 @@ class UserRestControllerTest {
     ObjectMapper objectMapper;
     @MockBean
     UserService userService;
+    @MockBean
+    JwtTokenUtil jwtTokenUtil;
 
-    UserJoinRequest userJoinRequest= UserJoinRequest.builder()
+    private final UserJoinRequest userJoinRequest= UserJoinRequest.builder()
             .userName("minji")
             .password("1234")
             .build();
-    UserLoginRequest userLoginRequest=UserLoginRequest.builder()
+    private final UserLoginRequest userLoginRequest=UserLoginRequest.builder()
             .userName("minji")
             .password("1234")
             .build();
+    private final UserRoleChangeRequest USER_ROLE_CHANGE_REQUEST=UserRoleChangeRequest.builder()
+            .role("ADMIN")
+            .build();
+    private final UserRoleChangeResponse USER_ROLE_CHANGE_RESPONSE=UserRoleChangeResponse.builder()
+            .userId(1)
+            .role(UserRole.ADMIN)
+            .userName("minji")
+            .build();
+    private final User USER= User.builder()
+            .id(1)
+            .userName("minji")
+            .password("1234")
+            .role(UserRole.USER)
+            .build();
+    private final User ADMIN= User.builder()
+            .id(1)
+            .userName("admin")
+            .password("admin")
+            .role(UserRole.ADMIN)
+            .build();
 
+    private final Authentication ADMIN_AUTHENTICATION=new UsernamePasswordAuthenticationToken(ADMIN, null, List.of(new SimpleGrantedAuthority(ADMIN.getRole().name())));
+    private final Authentication USER_AUTHENTICATION=new UsernamePasswordAuthenticationToken(USER, null, List.of(new SimpleGrantedAuthority(USER.getRole().name())));
+
+    private final String TOKEN="token";
+    private final String USERNAME="minji";
     @Test
     @DisplayName("회원가입 성공")
     @WithMockUser
     void join_success() throws Exception {
-        UserJoinResponse userJoinResponse=UserJoinResponse.builder().userId(0).userName("minji").build();
+        UserJoinResponse userJoinResponse=UserJoinResponse.builder().userId(0).userName(USERNAME).build();
         when(userService.join(any())).thenReturn(userJoinResponse);
 
         mockMvc.perform(post("/api/v1/users/join")
@@ -100,7 +137,7 @@ class UserRestControllerTest {
     @DisplayName("로그인 성공")
     @WithMockUser
     void login_success() throws Exception{
-        UserLoginResponse userLoginResponse=UserLoginResponse.builder().jwt("token").build();
+        UserLoginResponse userLoginResponse=UserLoginResponse.builder().jwt(TOKEN).build();
 
         when(userService.login(any())).thenReturn(userLoginResponse);
 
@@ -110,5 +147,19 @@ class UserRestControllerTest {
                         .content(objectMapper.writeValueAsBytes(userLoginRequest)))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("권한 변경 성공")
+    @WithMockUser
+    void changeRole_success() throws Exception{
+                when(userService.changeRole(any(), any(), any())).thenReturn(USER_ROLE_CHANGE_RESPONSE);
+
+        mockMvc.perform(post("/api/v1/users/1/role/change")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(USER_ROLE_CHANGE_REQUEST)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.role").value("ADMIN"));
     }
 }
