@@ -2,10 +2,8 @@ package com.likelion.sns.controller;
 
 import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -25,5 +23,11 @@ public class UserRestController {
     public Response<UserLoginResponse> login(@RequestBody UserLoginRequest dto){
         UserLoginResponse userLoginResponse=userService.login(dto);
         return Response.success(userLoginResponse);
+    }
+
+    @PostMapping("/{id}/role/change")
+    public Response<UserRoleChangeResponse> changeRole(@PathVariable Integer id, @RequestBody UserRoleChangeRequest dto, Authentication authentication){
+        UserRoleChangeResponse userRoleChangeResponse=userService.changeRole(dto, id, authentication.getName());
+        return Response.success(userRoleChangeResponse);
     }
 }
