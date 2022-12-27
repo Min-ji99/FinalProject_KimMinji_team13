@@ -33,9 +33,9 @@ public class PostRestController {
         Page<PostDto> posts=postService.getPostlist(pageable);
         return Response.success(posts);
     }
-    @GetMapping("/{id}")
-    public Response<PostDto> findPostById(@PathVariable Integer id){
-        PostDto post=postService.findPostById(id);
+    @GetMapping("/{postId}")
+    public Response<PostDto> findPostById(@PathVariable Integer postId){
+        PostDto post=postService.findPostById(postId);
         return Response.success(post);
     }
     @PutMapping("/{id}")
