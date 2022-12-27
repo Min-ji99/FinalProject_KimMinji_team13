@@ -1,13 +1,40 @@
-# 멋쟁이사자처럼 종합 프로젝트
-## MutsaSNS
+# MutsaSNS
+> ## 미션 요구사항 분석 & 체크리스트
+### 기능목록
+**필수**
+- [x] AWS EC2에 Docker로 배포
+- [x] Swagger
+- [x] Gitlab CI & Crontab CD
+- [x] 회원가입
+- [x] 로그인
+- [x] 포스트 작성, 수정, 조회, 삭제
+- [x] 포스트 리스트
+
+**도전**
+- [ ] 화면 UI 개발
+- [x] ADMIN 회원이 일반 회원을 ADMIN으로 승격 시키는 기능
+- [x] ADMIN 회원이 로그인 시 자신이 쓴 글이 아닌 글을 수정, 삭제 기능
+- [ ] 댓글 기능
+- [ ] 좋아요 기능
+- [ ] ADMIN 회원이 로그인 시 자신이 쓴 댓글이 아닌 댓글 수정, 삭제 기능
+
+> ## 1주차 미션 요약
+[아쉬운 점]
+- 테스트 코드 값을 하드코딩하지 않고 상수화 처리
+- 중복되는 기능은 함수로 분리
+- 테스트 코드를 제대로 구현하지 못함
+
+[궁금한 점]
+- 포스트 리스트를 조회할 때 정렬이 되었는지 확인하는 테스트 코드를 어떻게 작생하야하는가
+
+## URL
+http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
 
 ## Endpoint
 - `Get /api/v1/hello`<br>
-  http://ec2-43-200-170-38.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/hello-controller<br>
 
 ### 사용자
 - 회원가입 `Post /api/v1/users/join`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/user-rest-controller/joinUsingPOST<br>
   **Request Body**
   ```
   {
@@ -27,7 +54,6 @@
   ```
 
 - 로그인 `Post /api/v1/users/login`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/user-rest-controller/loginUsingPOST<br>
   **Request Body**
   ```
   {
@@ -44,10 +70,27 @@
     "resultCode": "string"
   }
   ```
+- 권한 부여 `Post /api/v1/users/{id}/role/change`<br>
+  **Request Body**
+  ```
+  {
+    "role" : "string"
+  }
+  ```
+  **Response Body**
+  ```
+  {
+    "result": {
+      "role": "ADMIN" | "USER",
+      "userId": 0,
+      "userName": "string"
+    },
+    "resultCode": "string"
+  }
+  ```
 
 ### 포스트
 - 포스트 작성 `Post /api/v1/posts`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/post-rest-controller/writeUsingPOST<br>
   **Request Body**
   ```
   {
@@ -67,7 +110,6 @@
   ```
 
 - 포스트 리스트 조회 `Get /api/v1/posts`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/post-rest-controller/getPostlistUsingGET<br>
   **Response Body**
   ```
   {
@@ -113,7 +155,6 @@
   ```
 
 - 포스트 상세 조회 `Get /api/v1/posts/{postId}`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/post-rest-controller/findPostByIdUsingGET<br>
   **Response Body**
   ```
   {
@@ -130,7 +171,6 @@
   ```
 
 - 포스트 수정 `Put /api/v1/posts/{id}`<br>
-  http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/post-rest-controller/modifyUsingPUT<br>
   **Request Body**
   ```
   {
@@ -149,7 +189,6 @@
   }
   ```
 - 포스트 삭제 `Delete /api/v1/posts/{id}`<br>
-  http://localhost:8081/swagger-ui/#/post-rest-controller/deleteUsingDELETE<br>
   **Response Body**
   ```
   {
