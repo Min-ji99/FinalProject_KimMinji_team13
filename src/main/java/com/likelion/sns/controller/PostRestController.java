@@ -48,4 +48,9 @@ public class PostRestController {
         PostResponse postResponse=postService.delete(id, authentication.getName());
         return Response.success(postResponse);
     }
+    @PostMapping("/{id}/comments")
+    public Response<CommentResponse> writeComment(@PathVariable Integer id, Authentication authentication, @RequestBody CommentWriteRequest dto){
+        CommentResponse commentResponse=postService.writeComment(id, dto, authentication.getName());
+        return Response.success(commentResponse);
+    }
 }
