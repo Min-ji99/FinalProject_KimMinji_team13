@@ -7,6 +7,7 @@ import com.likelion.sns.domain.dto.PostResponse;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
+import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.PostRepository;
 import com.likelion.sns.repository.UserRepository;
@@ -67,7 +68,8 @@ public class PostService {
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
 
         //post 작성자와 유저가 일치하는지 확인
-        if(user.getId()!=post.getUser().getId()){
+        //현재 유저의 권한이 ADMIN이 아닌지 확인
+        if(user.getId()!=post.getUser().getId() && user.getRole() != UserRole.ADMIN){
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
         }
         post.setTitle(dto.getTitle());
@@ -89,7 +91,8 @@ public class PostService {
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
         //post 작성자와 유저가 일치하는지 확인
-        if(user.getId()!=post.getUser().getId()){
+        //현재 유저의 권한이 ADMIN이 아닌지 확인
+        if(user.getId()!=post.getUser().getId() && user.getRole()!=UserRole.ADMIN){
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
         }
         postRepository.deleteById(id);
