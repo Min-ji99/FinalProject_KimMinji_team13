@@ -112,7 +112,7 @@
   }
   ```
 
-- 포스트 상세 조회 `Get /api/v1/posts/{id}`<br>
+- 포스트 상세 조회 `Get /api/v1/posts/{postId}`<br>
   http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/#/post-rest-controller/findPostByIdUsingGET<br>
   **Response Body**
   ```
