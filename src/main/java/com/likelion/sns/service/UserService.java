@@ -1,11 +1,9 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.UserJoinRequest;
-import com.likelion.sns.domain.dto.UserJoinResponse;
-import com.likelion.sns.domain.dto.UserLoginRequest;
-import com.likelion.sns.domain.dto.UserLoginResponse;
+import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
+import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.UserRepository;
 import com.likelion.sns.utils.JwtTokenUtil;
@@ -53,5 +51,19 @@ public class UserService {
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()-> new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s가 존재하지 않습니다.", userName)));
         return user;
+    }
+
+    public UserRoleChangeResponse changeRole(UserRoleChangeRequest dto, Integer id, String adminUserName) {
+        User admin=userRepository.findByUserName(adminUserName)
+                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("%s이 존재하지 않습니다.", adminUserName)));
+        User user=userRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("userId %d이 존재하지 않습니다.", id)));
+        user.setRole(UserRole.of(dto.getRole()));
+        User savedUser=userRepository.save(user);
+        return UserRoleChangeResponse.builder()
+                .userId(savedUser.getId())
+                .userName(savedUser.getUserName())
+                .role(savedUser.getRole())
+                .build();
     }
 }

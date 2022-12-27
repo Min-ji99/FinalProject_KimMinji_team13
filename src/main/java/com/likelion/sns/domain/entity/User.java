@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @Getter
+@Setter
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
