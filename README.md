@@ -148,3 +148,15 @@
     "resultCode": "string"
   }
   ```
+- 포스트 삭제 `Delete /api/v1/posts/{id}`<br>
+  http://localhost:8081/swagger-ui/#/post-rest-controller/deleteUsingDELETE<br>
+  **Response Body**
+  ```
+  {
+  "result": {
+    "message": "string",
+    "postId": 0
+  },
+  "resultCode": "string"
+  }
+  ```
