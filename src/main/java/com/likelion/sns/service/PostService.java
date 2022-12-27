@@ -1,14 +1,13 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.PostDto;
-import com.likelion.sns.domain.dto.PostModifyRequet;
-import com.likelion.sns.domain.dto.PostWriteRequest;
-import com.likelion.sns.domain.dto.PostResponse;
+import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.entity.Comment;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
+import com.likelion.sns.repository.CommentRepository;
 import com.likelion.sns.repository.PostRepository;
 import com.likelion.sns.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -19,10 +18,12 @@ import org.springframework.stereotype.Service;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     public PostResponse write(PostWriteRequest dto, String userName) {
@@ -99,6 +100,23 @@ public class PostService {
         return PostResponse.builder()
                 .message("포스트 삭제 완료")
                 .postId(post.getId())
+                .build();
+    }
+
+    public CommentResponse writeComment(Integer id, CommentWriteRequest dto, String userName) {
+        //존재하는 post인지 확인
+        Post post=postRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
+
+        User user=userRepository.findByUserName(userName)
+                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
+        Comment comment=commentRepository.save(dto.toEntity(user, post));
+
+        return CommentResponse.builder()
+                .id(comment.getId())
+                .postId(comment.getPost().getId())
+                .userName(comment.getUser().getUserName())
+                .message("댓글 등록 완료")
                 .build();
     }
 }

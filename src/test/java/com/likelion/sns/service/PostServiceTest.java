@@ -8,6 +8,7 @@ import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
+import com.likelion.sns.repository.CommentRepository;
 import com.likelion.sns.repository.PostRepository;
 import com.likelion.sns.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -27,6 +28,7 @@ class PostServiceTest {
     private PostService postService;
     private PostRepository postRepository= mock(PostRepository.class);
     private UserRepository userRepository= mock(UserRepository.class);
+    private CommentRepository commentRepository=mock(CommentRepository.class);
 
     private final User USER1=User.builder()
             .id(1)
@@ -54,7 +56,7 @@ class PostServiceTest {
 
     @BeforeEach
     void setup(){
-        postService=new PostService(postRepository, userRepository);
+        postService=new PostService(postRepository, userRepository, commentRepository);
     }
 
     @Test
