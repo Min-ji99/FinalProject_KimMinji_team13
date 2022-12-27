@@ -58,4 +58,9 @@ public class PostRestController {
         CommentResponse commentResponse=postService.modifyComment(id, dto, authentication.getName());
         return Response.success(commentResponse);
     }
+    @DeleteMapping("/{postId}/comments/{id}")
+    public Response<CommentResponse> deleteComment(@PathVariable Integer id, Authentication authentication){
+        CommentResponse commentResponse=postService.deleteComment(id, authentication.getName());
+        return Response.success(commentResponse);
+    }
 }
