@@ -119,4 +119,29 @@ public class PostService {
                 .message("댓글 등록 완료")
                 .build();
     }
+
+    public CommentResponse modifyComment(Integer id, CommentModifyRequest dto, String userName) {
+        //존재하는 Post인지 확인
+        Comment comment=commentRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.COMMENT_NOT_FOUND, String.format("해당 comment가 존재하지 않습니다.")));
+
+        //존재하는 유저인지 확인
+        User user=userRepository.findByUserName(userName)
+                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
+
+        //post 작성자와 유저가 일치하는지 확인
+        //현재 유저의 권한이 ADMIN이 아닌지 확인
+        if(user.getId()!=comment.getUser().getId() && user.getRole() != UserRole.ADMIN){
+            throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
+        }
+        comment.setComment(dto.getComment());
+        Comment savedComment=commentRepository.save(comment);
+
+        return CommentResponse.builder()
+                .id(comment.getId())
+                .postId(savedComment.getPost().getId())
+                .userName(savedComment.getUser().getUserName())
+                .message("댓글 수정 완료")
+                .build();
+    }
 }
