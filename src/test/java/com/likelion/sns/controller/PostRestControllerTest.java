@@ -52,7 +52,7 @@ class PostRestControllerTest {
                 .message("포스트 등록 완료")
                 .build();
 
-        when(postService.write(any(), any())).thenReturn(postResponse);
+        when(postService.writePost(any(), any())).thenReturn(postResponse);
 
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
@@ -67,7 +67,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 작성 실패 - 인증 실패")
     @WithAnonymousUser
     void write_fail() throws Exception {
-        when(postService.write(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        when(postService.writePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
@@ -128,7 +128,7 @@ class PostRestControllerTest {
                 .postId(1)
                 .message("포스트 수정 완료")
                 .build();
-        when(postService.modify(any(), any(), any())).thenReturn(postResponse);
+        when(postService.modifyPost(any(), any(), any())).thenReturn(postResponse);
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -147,7 +147,7 @@ class PostRestControllerTest {
                 .title("modify title")
                 .body("modify body")
                 .build();
-        when(postService.modify(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -164,7 +164,7 @@ class PostRestControllerTest {
                 .title("modify title")
                 .body("modify body")
                 .build();
-        when(postService.modify(any(), any(), any())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
+        when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -181,7 +181,7 @@ class PostRestControllerTest {
                 .title("modify title")
                 .body("modify body")
                 .build();
-        when(postService.modify(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -198,7 +198,7 @@ class PostRestControllerTest {
                 .title("modify title")
                 .body("modify body")
                 .build();
-        when(postService.modify(any(), any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
+        when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
@@ -215,7 +215,7 @@ class PostRestControllerTest {
                 .postId(1)
                 .message("포스트 삭제 완료")
                 .build();
-        when(postService.delete(any(), any())).thenReturn(postResponse);
+        when(postService.deletePost(any(), any())).thenReturn(postResponse);
 
         mockMvc.perform(delete("/api/v1/posts/1")
                         .with(csrf()))
@@ -228,7 +228,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 삭제 실패 - 인증 실패")
     @WithAnonymousUser
     void delete_fail1() throws Exception {
-        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(delete("/api/v1/posts/1")
                         .with(csrf()))
@@ -239,7 +239,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 삭제 실패 - 작성자 불일치")
     @WithAnonymousUser
     void delete_fail2() throws Exception {
-        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(delete("/api/v1/posts/1")
                         .with(csrf()))
@@ -250,7 +250,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 삭제 실패 - DB 에러")
     @WithMockUser
     void delete_fail3() throws Exception {
-        when(postService.delete(any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
+        when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf()))
