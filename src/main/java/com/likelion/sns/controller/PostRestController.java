@@ -24,7 +24,7 @@ public class PostRestController {
     @PostMapping
     public Response<PostResponse> write(@RequestBody PostWriteRequest dto, Authentication authentication){
         log.info("controller : {}", authentication);
-        PostResponse postResponse =postService.write(dto, authentication.getName());
+        PostResponse postResponse =postService.writePost(dto, authentication.getName());
         return Response.success(postResponse);
     }
     @GetMapping
@@ -40,12 +40,12 @@ public class PostRestController {
     }
     @PutMapping("/{id}")
     public Response<PostResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, Authentication authentication){
-        PostResponse postResponse =postService.modify(id, dto, authentication.getName());
+        PostResponse postResponse =postService.modifyPost(id, dto, authentication.getName());
         return Response.success(postResponse);
     }
     @DeleteMapping("/{id}")
     public Response<PostResponse> delete(@PathVariable Integer id, Authentication authentication){
-        PostResponse postResponse=postService.delete(id, authentication.getName());
+        PostResponse postResponse=postService.deletePost(id, authentication.getName());
         return Response.success(postResponse);
     }
     @PostMapping("/{id}/comments")
