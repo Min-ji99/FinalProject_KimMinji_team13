@@ -13,6 +13,7 @@ import com.likelion.sns.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -59,16 +60,15 @@ public class PostService {
                 .build();
     }
 
+    @Transactional
     public PostResponse modifyPost(Integer postId, PostModifyRequet dto, String userName) {
         Post post=getPostEntity(postId, userName);
 
-        post.setTitle(dto.getTitle());
-        post.setBody(dto.getBody());
-        Post savedPost=postRepository.save(post);
+        post.updatePost(dto.getTitle(), dto.getBody());
 
         return PostResponse.builder()
                 .message("포스트 수정 완료")
-                .postId(savedPost.getId())
+                .postId(post.getId())
                 .build();
     }
 
@@ -99,16 +99,16 @@ public class PostService {
                 .build();
     }
 
+    @Transactional
     public CommentResponse modifyComment(Integer commentId, CommentModifyRequest dto, String userName) {
         Comment comment=getCommentEntity(commentId, userName);
 
-        comment.setComment(dto.getComment());
-        Comment savedComment=commentRepository.save(comment);
+        comment.updateComment(dto.getComment());
 
         return CommentResponse.builder()
                 .id(comment.getId())
-                .postId(savedComment.getPost().getId())
-                .userName(savedComment.getUser().getUserName())
+                .postId(comment.getPost().getId())
+                .userName(comment.getUser().getUserName())
                 .message("댓글 수정 완료")
                 .build();
     }

@@ -25,4 +25,8 @@ public class Comment extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="post_id")
     private Post post;
+
+    public void updateComment(String comment){
+        this.comment=comment;
+    }
 }

@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Post extends BaseEntity{
@@ -23,4 +22,9 @@ public class Post extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
+
+    public void updatePost(String title, String body){
+        this.title=title;
+        this.body=body;
+    }
 }
