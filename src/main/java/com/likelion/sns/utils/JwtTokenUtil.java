@@ -18,6 +18,7 @@ import java.util.List;
 public class JwtTokenUtil {
     private final String secretKey;
     private final long expireTimeMs;
+    private final String USERNAME="userName";
 
     public JwtTokenUtil(@Value("${jwt.token.secret}")String secretKey) {
         this.secretKey = secretKey;
@@ -26,7 +27,7 @@ public class JwtTokenUtil {
 
     public String createToken(String userName){
         Claims claims= Jwts.claims();
-        claims.put("userName", userName);
+        claims.put(USERNAME, userName);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -46,7 +47,7 @@ public class JwtTokenUtil {
     }
 
     public String getUsername(String token) {
-        return extractClaims(token).get("userName").toString();
+        return extractClaims(token).get(USERNAME).toString();
     }
     public boolean validateToken(String token){
         try{

@@ -15,10 +15,11 @@ import java.io.IOException;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private final String EXCEPTION="exception";
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        ErrorResponse errorResponse=(ErrorResponse) request.getAttribute("exception");
+        ErrorResponse errorResponse=(ErrorResponse) request.getAttribute(EXCEPTION);
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
