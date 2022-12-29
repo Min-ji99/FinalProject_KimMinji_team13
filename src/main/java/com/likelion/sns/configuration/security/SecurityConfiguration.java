@@ -24,7 +24,7 @@ public class SecurityConfiguration {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final String[] SWAGGER_PERMIT_URL={"/swagger-resources/**", "/swagger-ui/**", "/swagger/**", "/webjars/**", "/v2/api-docs/**"};
-    private final String[] PERMIT_URL={"/api/v1/hello", "/api/v1/users/join", "/api/v1/users/login"};
+    private final String[] PERMIT_URL={"/api/v1/hello/**", "/api/v1/users/join", "/api/v1/users/login"};
     private final String ADMIN_PERMIT_URL="/api/v1/users/**/role/change";
     private final String PERMIT_GET_URL="/api/v1/posts/**";
     private final String ROLE_ADMIN="ADMIN";
