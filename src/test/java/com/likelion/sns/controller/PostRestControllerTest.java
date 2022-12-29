@@ -39,9 +39,14 @@ class PostRestControllerTest {
     @MockBean
     PostService postService;
 
-    PostWriteRequest postWriteRequest=PostWriteRequest.builder()
+    private final PostWriteRequest POST_WRITE_REQUEST=PostWriteRequest.builder()
             .title("title")
             .body("body")
+            .build();
+
+    private final PostModifyRequet POST_MODIFY_REQUEST=PostModifyRequet.builder()
+            .title("modify title")
+            .body("modify body")
             .build();
     @Test
     @DisplayName("포스트 작성 성공")
@@ -57,7 +62,7 @@ class PostRestControllerTest {
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postWriteRequest)))
+                        .content(objectMapper.writeValueAsBytes(POST_WRITE_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.message").exists())
@@ -72,7 +77,7 @@ class PostRestControllerTest {
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postWriteRequest)))
+                        .content(objectMapper.writeValueAsBytes(POST_WRITE_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -119,11 +124,6 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 성공")
     @WithMockUser
     void modify_success() throws Exception {
-        PostModifyRequet postModifyRequet=PostModifyRequet.builder()
-                .title("modify title")
-                .body("modify body")
-                .build();
-
         PostResponse postResponse = PostResponse.builder()
                 .postId(1)
                 .message("포스트 수정 완료")
@@ -133,7 +133,7 @@ class PostRestControllerTest {
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postModifyRequet)))
+                        .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.message").exists())
@@ -143,16 +143,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 실패 - 인증 실패")
     @WithAnonymousUser
     void modify_fail1() throws Exception {
-        PostModifyRequet postModifyRequet=PostModifyRequet.builder()
-                .title("modify title")
-                .body("modify body")
-                .build();
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postWriteRequest)))
+                        .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -160,16 +156,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 실패 - post 존재하지 않을때")
     @WithMockUser
     void modify_fail2() throws Exception {
-        PostModifyRequet postModifyRequet=PostModifyRequet.builder()
-                .title("modify title")
-                .body("modify body")
-                .build();
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postModifyRequet)))
+                        .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -177,16 +169,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 실패 - 작성자가 일치하지 않을때")
     @WithMockUser
     void modify_fail3() throws Exception {
-        PostModifyRequet postModifyRequet=PostModifyRequet.builder()
-                .title("modify title")
-                .body("modify body")
-                .build();
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postModifyRequet)))
+                        .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -194,16 +182,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 실패 - DB 에러")
     @WithMockUser
     void modify_fail4() throws Exception {
-        PostModifyRequet postModifyRequet=PostModifyRequet.builder()
-                .title("modify title")
-                .body("modify body")
-                .build();
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
 
         mockMvc.perform(put("/api/v1/posts/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(postModifyRequet)))
+                        .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
     }

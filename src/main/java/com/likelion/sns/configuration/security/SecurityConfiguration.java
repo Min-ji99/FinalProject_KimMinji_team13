@@ -23,6 +23,12 @@ public class SecurityConfiguration {
     private final CustomAccessDeniedEntryPoint customAccessDeniedEntryPoint;
     private final JwtTokenUtil jwtTokenUtil;
 
+    private final String[] SWAGGER_PERMIT_URL={"/swagger-resources/**", "/swagger-ui/**", "/swagger/**", "/webjars/**", "/v2/api-docs/**"};
+    private final String[] PERMIT_URL={"/api/v1/hello", "/api/v1/users/join", "/api/v1/users/login"};
+    private final String ADMIN_PERMIT_URL="/api/v1/users/**/role/change";
+    private final String PERMIT_GET_URL="/api/v1/posts/**";
+    private final String ROLE_ADMIN="ADMIN";
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -32,11 +38,11 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/swagger-resources/**", "/swagger-ui/**", "/swagger/**", "/webjars/**", "/v2/api-docs/**").permitAll()
-                .antMatchers("/api/v1/hello", "/api/v1/users/join", "/api/v1/users/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
-                // /api/v1/users/*/role/change 요청에 대해서는 ROLE_ADMIN 역할을 가지고 있어야 한다.
-                .antMatchers("/api/v1/users/**/role/change").hasAuthority("ADMIN")
+                .antMatchers(SWAGGER_PERMIT_URL).permitAll()
+                .antMatchers(PERMIT_URL).permitAll()
+                .antMatchers(HttpMethod.GET, PERMIT_GET_URL).permitAll()
+                // /api/v1/users/*/role/change 요청에 대해서는 ADMIN만 가능
+                .antMatchers(ADMIN_PERMIT_URL).hasAuthority(ROLE_ADMIN)
                 //나머지 요청은 모두 로그인 요구함
                 .anyRequest().authenticated()
                 .and()

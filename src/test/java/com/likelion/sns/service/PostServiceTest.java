@@ -64,7 +64,7 @@ class PostServiceTest {
     void post_fail(){
         Mockito.when(userRepository.findByUserName(any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND, ""));
 
-        Assertions.assertThatThrownBy(()->postService.write(postWriteRequest,USER1.getUserName()));
+        Assertions.assertThatThrownBy(()->postService.writePost(postWriteRequest,USER1.getUserName()));
     }
     @Test
     @DisplayName("등록 성공")
@@ -72,7 +72,7 @@ class PostServiceTest {
         Mockito.when(userRepository.findByUserName(USER1.getUserName())).thenReturn(Optional.of(USER1));
         Mockito.when(postRepository.save(any())).thenReturn(POST);
 
-        PostResponse postResponse =postService.write(postWriteRequest, USER1.getUserName());
+        PostResponse postResponse =postService.writePost(postWriteRequest, USER1.getUserName());
 
         assertEquals(postResponse.getPostId(), USER1.getId());
         assertEquals(postResponse.getMessage(), "포스트 등록 완료");
@@ -99,7 +99,7 @@ class PostServiceTest {
     @DisplayName("포스트 수정 - 포스트 존재하지 않을 때")
     void modify_fail_no_post(){
         Mockito.when(postRepository.findById(POST.getId())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
-        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        AppException appException=assertThrows(AppException.class, ()->postService.modifyPost(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
     @Test
@@ -107,7 +107,7 @@ class PostServiceTest {
     void modify_fail_no_user(){
         Mockito.when(postRepository.findById(POST.getId())).thenReturn(Optional.of(POST));
         Mockito.when(userRepository.findByUserName(any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND, ""));
-        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        AppException appException=assertThrows(AppException.class, ()->postService.modifyPost(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.USERNAME_NOT_FOUND);
     }
     @Test
@@ -115,7 +115,7 @@ class PostServiceTest {
     void modify_fail_not_match(){
         Mockito.when(postRepository.findById(POST.getId())).thenReturn(Optional.of(POST));
         Mockito.when(userRepository.findByUserName(USER2.getUserName())).thenReturn(Optional.of(USER2));
-        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER2.getUserName()));
+        AppException appException=assertThrows(AppException.class, ()->postService.modifyPost(POST.getId(), MODIFYREQUEST, USER2.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.INVALID_PERMISSION);
     }
     @Test
@@ -123,14 +123,14 @@ class PostServiceTest {
     void delete_fail_no_user(){
         Mockito.when(postRepository.findById(POST.getId())).thenReturn(Optional.of(POST));
         Mockito.when(userRepository.findByUserName(any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND, ""));
-        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        AppException appException=assertThrows(AppException.class, ()->postService.modifyPost(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.USERNAME_NOT_FOUND);
     }
     @Test
     @DisplayName("포스트 삭제 - 포스트 존재하지 않을 때")
     void delete_fail_no_post(){
         Mockito.when(postRepository.findById(POST.getId())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
-        AppException appException=assertThrows(AppException.class, ()->postService.modify(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
+        AppException appException=assertThrows(AppException.class, ()->postService.modifyPost(POST.getId(), MODIFYREQUEST, USER1.getUserName()));
         assertEquals(appException.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
 }

@@ -17,6 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
+    private static final String POST_WRITE_SUCCESS="포스트 등록 완료";
+    private static final String POST_MODIFY_SUCCESS="포스트 수정 완료";
+    private static final String POST_DELETE_SUCCESS="포스트 삭제 완료";
+    private static final String COMMENT_WRITE_SUCCESS="댓글 등록 완료";
+    private static final String COMMENT_MODIFY_SUCCESS="댓글 수정 완료";
+    private static final String COMMENT_DELETE_SUCCESS="댓글 삭제 완료";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -34,7 +40,7 @@ public class PostService {
 
         Post post=postRepository.save(dto.toEntity(user));
         return PostResponse.builder()
-                .message("포스트 등록 완료")
+                .message(POST_WRITE_SUCCESS)
                 .postId(post.getId())
                 .build();
     }
@@ -67,7 +73,7 @@ public class PostService {
         post.updatePost(dto.getTitle(), dto.getBody());
 
         return PostResponse.builder()
-                .message("포스트 수정 완료")
+                .message(POST_MODIFY_SUCCESS)
                 .postId(post.getId())
                 .build();
     }
@@ -77,7 +83,7 @@ public class PostService {
 
         postRepository.deleteById(postId);
         return PostResponse.builder()
-                .message("포스트 삭제 완료")
+                .message(POST_DELETE_SUCCESS)
                 .postId(post.getId())
                 .build();
     }
@@ -95,7 +101,7 @@ public class PostService {
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getUserName())
-                .message("댓글 등록 완료")
+                .message(COMMENT_WRITE_SUCCESS)
                 .build();
     }
 
@@ -109,7 +115,7 @@ public class PostService {
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getUserName())
-                .message("댓글 수정 완료")
+                .message(COMMENT_MODIFY_SUCCESS)
                 .build();
     }
 
@@ -118,7 +124,7 @@ public class PostService {
 
         commentRepository.deleteById(commentId);
         return CommentResponse.builder()
-                .message("댓글 삭제 완료")
+                .message(COMMENT_DELETE_SUCCESS)
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getUserName())

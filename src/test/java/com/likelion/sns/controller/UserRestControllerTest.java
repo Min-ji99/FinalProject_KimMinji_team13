@@ -71,10 +71,6 @@ class UserRestControllerTest {
             .password("admin")
             .role(UserRole.ADMIN)
             .build();
-
-    private final Authentication ADMIN_AUTHENTICATION=new UsernamePasswordAuthenticationToken(ADMIN, null, List.of(new SimpleGrantedAuthority(ADMIN.getRole().name())));
-    private final Authentication USER_AUTHENTICATION=new UsernamePasswordAuthenticationToken(USER, null, List.of(new SimpleGrantedAuthority(USER.getRole().name())));
-
     private final String TOKEN="token";
     private final String USERNAME="minji";
     @Test

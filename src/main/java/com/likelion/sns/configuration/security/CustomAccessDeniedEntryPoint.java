@@ -14,11 +14,12 @@ import java.io.IOException;
 
 @Component
 public class CustomAccessDeniedEntryPoint implements AccessDeniedHandler {
+
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INVALID_PERMISSION, "사용자가 권한이 없습니다.");
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INVALID_PERMISSION, ErrorCode.INVALID_PERMISSION.getMessage());
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json");

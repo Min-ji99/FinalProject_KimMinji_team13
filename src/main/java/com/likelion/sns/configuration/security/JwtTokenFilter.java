@@ -30,6 +30,9 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final String TOKEN_NOT_FOUND="토큰이 존재하지 않습니다.";
+    private final String NO_BAERER_TYPE="Bearer Token이 아닙니다.";
+    private final String INVALID_TOKEN="토큰이 유효하지 않습니다.";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,13 +40,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         log.info("authorization : {}", header);
 
         if(header == null){
-            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "토큰이 존재하지 않습니다.");
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, TOKEN_NOT_FOUND);
             request.setAttribute("exception", errorResponse);
             filterChain.doFilter(request, response);
             return;
         }
         if(!header.startsWith("Bearer ")){
-            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "Bearer Token이 아닙니다.");
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, NO_BAERER_TYPE);
             request.setAttribute("exception", errorResponse);
             filterChain.doFilter(request, response);
             return;
@@ -58,7 +61,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }else{
-            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, "유효하지 않은 token 입니다.");
+            ErrorResponse errorResponse=new ErrorResponse(ErrorCode.INVALID_TOKEN, INVALID_TOKEN);
             request.setAttribute("exception", errorResponse);
         }
         filterChain.doFilter(request, response);
