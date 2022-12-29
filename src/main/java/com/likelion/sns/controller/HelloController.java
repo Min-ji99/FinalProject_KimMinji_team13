@@ -1,15 +1,15 @@
 package com.likelion.sns.controller;
 
-import com.likelion.sns.service.HelloService;
+import com.likelion.sns.service.AlgorithmService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/hello")
 public class HelloController {
-    private final HelloService helloService;
+    private final AlgorithmService algorithmService;
 
-    public HelloController(HelloService helloService) {
-        this.helloService = helloService;
+    public HelloController(AlgorithmService algorithmService) {
+        this.algorithmService = algorithmService;
     }
 
     @GetMapping("")
@@ -18,7 +18,7 @@ public class HelloController {
     }
     @GetMapping("/{num}")
     public String sumOfDigits(@PathVariable Integer num){
-        int sum=helloService.sumOfDigits(num);
+        int sum= algorithmService.sumOfDigits(num);
         return String.valueOf(sum);
     }
 }
