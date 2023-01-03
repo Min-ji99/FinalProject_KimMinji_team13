@@ -48,19 +48,25 @@ public class PostRestController {
         PostResponse postResponse=postService.deletePost(id, authentication.getName());
         return Response.success(postResponse);
     }
-    @PostMapping("/{id}/comments")
-    public Response<CommentResponse> writeComment(@PathVariable Integer id, Authentication authentication, @RequestBody CommentWriteRequest dto){
-        CommentResponse commentResponse=postService.writeComment(id, dto, authentication.getName());
+    @PostMapping("/{postId}/comments")
+    public Response<CommentResponse> writeComment(@PathVariable Integer postId, Authentication authentication, @RequestBody CommentWriteRequest dto){
+        CommentResponse commentResponse=postService.writeComment(postId, dto, authentication.getName());
         return Response.success(commentResponse);
     }
     @PutMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> modifyComment(@PathVariable Integer id, Authentication authentication, @RequestBody CommentModifyRequest dto){
+    public Response<CommentResponse> modifyComment(@PathVariable Long id, Authentication authentication, @RequestBody CommentModifyRequest dto){
         CommentResponse commentResponse=postService.modifyComment(id, dto, authentication.getName());
         return Response.success(commentResponse);
     }
     @DeleteMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> deleteComment(@PathVariable Integer id, Authentication authentication){
+    public Response<CommentResponse> deleteComment(@PathVariable Long id, Authentication authentication){
         CommentResponse commentResponse=postService.deleteComment(id, authentication.getName());
         return Response.success(commentResponse);
+    }
+    @GetMapping("/{postId}/comments")
+    public Response<Page<CommentDto>> getCommentList(@PageableDefault(size=10)
+                                               @SortDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable, @PathVariable Integer postId){
+        Page<CommentDto> commentDtos=postService.getCommentList(postId, pageable);
+        return Response.success(commentDtos);
     }
 }
