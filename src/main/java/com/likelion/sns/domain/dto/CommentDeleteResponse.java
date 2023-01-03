@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentResponse {
+public class CommentDeleteResponse {
     private Long id;
-    private String userName;
-    private Integer postId;
     private String message;
 }

@@ -50,19 +50,19 @@ public class PostRestController {
         return Response.success(postResponse);
     }
     @PostMapping("/{postId}/comments")
-    public Response<CommentResponse> writeComment(@PathVariable Integer postId, @ApiIgnore Authentication authentication, @RequestBody CommentWriteRequest dto){
-        CommentResponse commentResponse=postService.writeComment(postId, dto, authentication.getName());
-        return Response.success(commentResponse);
+    public Response<CommentDto> writeComment(@PathVariable Integer postId, @ApiIgnore Authentication authentication, @RequestBody CommentWriteRequest dto){
+        CommentDto commentDto =postService.writeComment(postId, dto, authentication.getName());
+        return Response.success(commentDto);
     }
     @PutMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> modifyComment(@PathVariable Long id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
-        CommentResponse commentResponse=postService.modifyComment(id, dto, authentication.getName());
-        return Response.success(commentResponse);
+    public Response<CommentDto> modifyComment(@PathVariable Long id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
+        CommentDto commentDto =postService.modifyComment(id, dto, authentication.getName());
+        return Response.success(commentDto);
     }
     @DeleteMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> deleteComment(@PathVariable Long id, @ApiIgnore Authentication authentication){
-        CommentResponse commentResponse=postService.deleteComment(id, authentication.getName());
-        return Response.success(commentResponse);
+    public Response<CommentDeleteResponse> deleteComment(@PathVariable Long id, @ApiIgnore Authentication authentication){
+        CommentDeleteResponse commentDeleteResponse =postService.deleteComment(id, authentication.getName());
+        return Response.success(commentDeleteResponse);
     }
     @GetMapping("/{postId}/comments")
     public Response<Page<CommentDto>> getCommentList(@PageableDefault(size=10)

@@ -20,8 +20,6 @@ public class PostService {
     private static final String POST_WRITE_SUCCESS="포스트 등록 완료";
     private static final String POST_MODIFY_SUCCESS="포스트 수정 완료";
     private static final String POST_DELETE_SUCCESS="포스트 삭제 완료";
-    private static final String COMMENT_WRITE_SUCCESS="댓글 등록 완료";
-    private static final String COMMENT_MODIFY_SUCCESS="댓글 수정 완료";
     private static final String COMMENT_DELETE_SUCCESS="댓글 삭제 완료";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -87,8 +85,17 @@ public class PostService {
                 .postId(post.getId())
                 .build();
     }
+    public Page<CommentDto> getCommentList(Integer postId, Pageable pageable) {
+        //postId 유효한지 확인
+        Post post=postRepository.findById(postId)
+                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, "해당 페이지가 존재하지 않습니다."));
 
-    public CommentResponse writeComment(Integer postId, CommentWriteRequest dto, String userName) {
+        Page<Comment> comments=commentRepository.findByPost(pageable, post);
+        Page<CommentDto> commentDtos=CommentDto.toList(comments);
+        return commentDtos;
+    }
+
+    public CommentDto writeComment(Integer postId, CommentWriteRequest dto, String userName) {
         //존재하는 post인지 확인
         Post post=postRepository.findById(postId)
                 .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
@@ -97,37 +104,39 @@ public class PostService {
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
         Comment comment=commentRepository.save(dto.toEntity(user, post));
 
-        return CommentResponse.builder()
+        return CommentDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getUserName())
-                .message(COMMENT_WRITE_SUCCESS)
+                .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt())
+                .lastModifiedAt(comment.getLastModifiedAt())
                 .build();
     }
 
     @Transactional
-    public CommentResponse modifyComment(Long commentId, CommentModifyRequest dto, String userName) {
+    public CommentDto modifyComment(Long commentId, CommentModifyRequest dto, String userName) {
         Comment comment=getCommentEntity(commentId, userName);
 
         comment.updateComment(dto.getComment());
 
-        return CommentResponse.builder()
+        return CommentDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
                 .userName(comment.getUser().getUserName())
-                .message(COMMENT_MODIFY_SUCCESS)
+                .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt())
+                .lastModifiedAt(comment.getLastModifiedAt())
                 .build();
     }
 
-    public CommentResponse deleteComment(Long commentId, String userName) {
+    public CommentDeleteResponse deleteComment(Long commentId, String userName) {
         Comment comment=getCommentEntity(commentId, userName);
 
         commentRepository.deleteById(commentId);
-        return CommentResponse.builder()
+        return CommentDeleteResponse.builder()
                 .message(COMMENT_DELETE_SUCCESS)
                 .id(comment.getId())
-                .postId(comment.getPost().getId())
-                .userName(comment.getUser().getUserName())
                 .build();
     }
     private Post getPostEntity(Integer postId, String userName){
@@ -168,15 +177,5 @@ public class PostService {
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 comment 접근 권한이 없습니다.", user.getUserName()));
         }
         return true;
-    }
-
-    public Page<CommentDto> getCommentList(Integer postId, Pageable pageable) {
-        //postId 유효한지 확인
-        Post post=postRepository.findById(postId)
-                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, "해당 페이지가 존재하지 않습니다."));
-
-        Page<Comment> comments=commentRepository.findByPost(pageable, post);
-        Page<CommentDto> commentDtos=CommentDto.toList(comments);
-        return commentDtos;
     }
 }
