@@ -28,6 +28,7 @@ public class CommentDto {
                 .userName(entity.getUser().getUserName())
                 .postId(entity.getPost().getId())
                 .createdAt(entity.getCreatedAt())
+                .lastModifiedAt(entity.getLastModifiedAt())
                 .build());
     }
 }
