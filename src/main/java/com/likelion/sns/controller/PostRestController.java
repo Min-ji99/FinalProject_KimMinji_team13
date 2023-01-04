@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -22,7 +23,7 @@ public class PostRestController {
     }
 
     @PostMapping
-    public Response<PostResponse> write(@RequestBody PostWriteRequest dto, Authentication authentication){
+    public Response<PostResponse> write(@RequestBody PostWriteRequest dto, @ApiIgnore Authentication authentication){
         log.info("controller : {}", authentication);
         PostResponse postResponse =postService.writePost(dto, authentication.getName());
         return Response.success(postResponse);
@@ -39,28 +40,34 @@ public class PostRestController {
         return Response.success(post);
     }
     @PutMapping("/{id}")
-    public Response<PostResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, Authentication authentication){
+    public Response<PostResponse> modify(@PathVariable Integer id, @RequestBody PostModifyRequet dto, @ApiIgnore Authentication authentication){
         PostResponse postResponse =postService.modifyPost(id, dto, authentication.getName());
         return Response.success(postResponse);
     }
     @DeleteMapping("/{id}")
-    public Response<PostResponse> delete(@PathVariable Integer id, Authentication authentication){
+    public Response<PostResponse> delete(@PathVariable Integer id, @ApiIgnore Authentication authentication){
         PostResponse postResponse=postService.deletePost(id, authentication.getName());
         return Response.success(postResponse);
     }
-    @PostMapping("/{id}/comments")
-    public Response<CommentResponse> writeComment(@PathVariable Integer id, Authentication authentication, @RequestBody CommentWriteRequest dto){
-        CommentResponse commentResponse=postService.writeComment(id, dto, authentication.getName());
-        return Response.success(commentResponse);
+    @PostMapping("/{postId}/comments")
+    public Response<CommentDto> writeComment(@PathVariable Integer postId, @ApiIgnore Authentication authentication, @RequestBody CommentWriteRequest dto){
+        CommentDto commentDto =postService.writeComment(postId, dto, authentication.getName());
+        return Response.success(commentDto);
     }
     @PutMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> modifyComment(@PathVariable Integer id, Authentication authentication, @RequestBody CommentModifyRequest dto){
-        CommentResponse commentResponse=postService.modifyComment(id, dto, authentication.getName());
-        return Response.success(commentResponse);
+    public Response<CommentDto> modifyComment(@PathVariable Long id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
+        CommentDto commentDto =postService.modifyComment(id, dto, authentication.getName());
+        return Response.success(commentDto);
     }
     @DeleteMapping("/{postId}/comments/{id}")
-    public Response<CommentResponse> deleteComment(@PathVariable Integer id, Authentication authentication){
-        CommentResponse commentResponse=postService.deleteComment(id, authentication.getName());
-        return Response.success(commentResponse);
+    public Response<CommentDeleteResponse> deleteComment(@PathVariable Long id, @ApiIgnore Authentication authentication){
+        CommentDeleteResponse commentDeleteResponse =postService.deleteComment(id, authentication.getName());
+        return Response.success(commentDeleteResponse);
+    }
+    @GetMapping("/{postId}/comments")
+    public Response<Page<CommentDto>> getCommentList(@PageableDefault(size=10)
+                                               @SortDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable, @PathVariable Integer postId){
+        Page<CommentDto> commentDtos=postService.getCommentList(postId, pageable);
+        return Response.success(commentDtos);
     }
 }
