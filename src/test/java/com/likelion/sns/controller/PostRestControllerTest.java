@@ -48,6 +48,7 @@ class PostRestControllerTest {
     private final String userName="minji";
     private final String COMMENT_GET_WRITE_URL="/api/v1/posts/"+POST_ID+"/comments";
     private final String COMMENT_MODIFY_DELETE_URL="/api/v1/posts/"+POST_ID+"/comments/"+COMMENT_ID;
+    private final String LIKE_URL="/api/v1/posts/"+POST_ID+"/likes";
 
     private final PostWriteRequest POST_WRITE_REQUEST=PostWriteRequest.builder()
             .title("title")
@@ -57,6 +58,18 @@ class PostRestControllerTest {
     private final PostModifyRequet POST_MODIFY_REQUEST=PostModifyRequet.builder()
             .title("modify title")
             .body("modify body")
+            .build();
+    private final PostResponse POST_RESPONSE = PostResponse.builder()
+            .postId(0)
+            .message("포스트 등록 완료")
+            .build();
+    private final PostDto POST_DTO= PostDto.builder()
+            .id(1)
+            .title("Title")
+            .body("Body")
+            .userName("minji")
+            .createdAt(LocalDateTime.now())
+            .lastModifiedAt(LocalDateTime.now())
             .build();
     private final CommentWriteRequest COMMENT_WRITE_REQUEST=CommentWriteRequest.builder()
             .comment(COMMENT)
@@ -82,17 +95,15 @@ class PostRestControllerTest {
             .id(COMMENT_ID)
             .message(DELETE_COMMENT)
             .build();
+    private final LikeResponse LIKE_RESPONSE=LikeResponse.builder()
+            .message("좋아요를 눌렀습니다.")
+            .build();
 
     @Test
     @DisplayName("포스트 작성 성공")
     @WithMockUser
     void write_success() throws Exception {
-        PostResponse postResponse = PostResponse.builder()
-                .postId(0)
-                .message("포스트 등록 완료")
-                .build();
-
-        when(postService.writePost(any(), any())).thenReturn(postResponse);
+        when(postService.writePost(any(), any())).thenReturn(POST_RESPONSE);
 
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
@@ -139,16 +150,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 상세 조회 - id, title, body, userName 존재")
     @WithMockUser
     void getPostById_success() throws Exception{
-        PostDto postDto= PostDto.builder()
-                .id(1)
-                .title("Title")
-                .body("Body")
-                .userName("minji")
-                .createdAt(LocalDateTime.now())
-                .lastModifiedAt(LocalDateTime.now())
-                .build();
-
-        when(postService.findPostById(any())).thenReturn(postDto);
+        when(postService.findPostById(any())).thenReturn(POST_DTO);
 
         mockMvc.perform(get("/api/v1/posts/1")
                         .with(csrf()))
@@ -287,8 +289,9 @@ class PostRestControllerTest {
     @DisplayName("댓글 목록 조회 성공")
     @WithMockUser
     void getCommentList() throws Exception{
-        String url="/api/v1/posts/1/comments";
-        mockMvc.perform(get(url))
+        when(postService.writePost(any(), any())).thenReturn(POST_RESPONSE);
+        when(postService.writeComment(any(), any(), any())).thenReturn(COMMENT_DTO);
+        mockMvc.perform(get(COMMENT_GET_WRITE_URL))
                 .andDo(print())
                 .andExpect(status().isOk());
         ArgumentCaptor<Pageable> pageableArgumentCaptor=ArgumentCaptor.forClass(Pageable.class);
@@ -464,5 +467,37 @@ class PostRestControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
+
+    }
+    @Test
+    @DisplayName("좋아요 누르기 성공")
+    @WithMockUser
+    void like_success() throws Exception{
+        when(postService.like(any(), any())).thenReturn(LIKE_RESPONSE);
+
+        mockMvc.perform(post(LIKE_URL)
+                .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("좋아요 누르기 실패(1) - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    void like_fail1() throws Exception{
+        when(postService.like(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
+        mockMvc.perform(post(LIKE_URL)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @DisplayName("좋아요 누르기 실패(2) - 해당 Post가 없는 경우")
+    @WithMockUser
+    void like_fail2() throws Exception{
+        when(postService.like(any(), any())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
+        mockMvc.perform(post(LIKE_URL)
+                .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
