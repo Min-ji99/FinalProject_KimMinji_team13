@@ -45,6 +45,7 @@ class PostRestControllerTest {
     private final String COMMENT="댓글 작성";
     private final String MODIFY_COMMENT="댓글 수정";
     private final String DELETE_COMMENT="댓글 삭제 완료";
+    private final String LIKE_RESPONSE="좋아요를 눌렀습니다.";
     private final String userName="minji";
     private final String COMMENT_GET_WRITE_URL="/api/v1/posts/"+POST_ID+"/comments";
     private final String COMMENT_MODIFY_DELETE_URL="/api/v1/posts/"+POST_ID+"/comments/"+COMMENT_ID;
@@ -94,9 +95,6 @@ class PostRestControllerTest {
     private final CommentDeleteResponse COMMENT_DELETE_RESPONSE=CommentDeleteResponse.builder()
             .id(COMMENT_ID)
             .message(DELETE_COMMENT)
-            .build();
-    private final LikeResponse LIKE_RESPONSE=LikeResponse.builder()
-            .message("좋아요를 눌렀습니다.")
             .build();
 
     @Test

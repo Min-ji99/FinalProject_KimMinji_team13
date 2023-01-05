@@ -71,8 +71,14 @@ public class PostRestController {
         return Response.success(commentDtos);
     }
     @PostMapping("/{postId}/likes")
-    public Response<LikeResponse> like(@PathVariable Integer postId, Authentication authentication){
-        LikeResponse likeResponse=postService.like(postId, authentication.getName());
+    public Response<String> like(@PathVariable Integer postId, Authentication authentication){
+        String likeResponse=postService.like(postId, authentication.getName());
         return Response.success(likeResponse);
+    }
+    @GetMapping("/{postId}/likes")
+    public Response<Long> likeCount(@PathVariable Integer postId){
+        Long likeCount=postService.likeCount(postId);
+
+        return Response.success(likeCount);
     }
 }

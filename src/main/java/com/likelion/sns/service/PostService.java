@@ -25,6 +25,7 @@ public class PostService {
     private static final String POST_MODIFY_SUCCESS="포스트 수정 완료";
     private static final String POST_DELETE_SUCCESS="포스트 삭제 완료";
     private static final String COMMENT_DELETE_SUCCESS="댓글 삭제 완료";
+    private static final String LIKE_SUCCESS="좋아요를 눌렀습니다";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -141,7 +142,8 @@ public class PostService {
                 .id(comment.getId())
                 .build();
     }
-    public LikeResponse like(Integer postId, String userName) {
+    @Transactional
+    public String like(Integer postId, String userName) {
         Post post=getPostEntity(postId);
         User user=getUserEntity(userName);
         likeRepository.findByPostAndUser(post, user)
@@ -149,9 +151,14 @@ public class PostService {
                     throw new AppException(ErrorCode.DUPLICATED_LIKE, ErrorCode.DUPLICATED_LIKE.getMessage());
                 });
         likeRepository.save(Like.of(post, user));
-        return LikeResponse.builder()
-                .message("좋아요를 눌렀습니다.")
-                .build();
+        return LIKE_SUCCESS;
+    }
+    public Long likeCount(Integer postId) {
+        //post 존재하는지 확인
+        Post post=getPostEntity(postId);
+        //Like가 없다면 0으로 반환
+        Long likeCnt=likeRepository.countByPost(post);
+        return likeCnt;
     }
     private Post getPostEntity(Integer postId){
         //존재하는 Post인지 확인
