@@ -2,18 +2,22 @@ package com.likelion.sns.service;
 
 import com.likelion.sns.domain.dto.*;
 import com.likelion.sns.domain.entity.Comment;
+import com.likelion.sns.domain.entity.Like;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.CommentRepository;
+import com.likelion.sns.repository.LikeRepository;
 import com.likelion.sns.repository.PostRepository;
 import com.likelion.sns.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -24,17 +28,18 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.likeRepository = likeRepository;
     }
 
     public PostResponse writePost(PostWriteRequest dto, String userName) {
         //userName이 존재하지 않으면 USERNAME_NOT_FOUND 예외 발생
-        User user=userRepository.findByUserName(userName)
-                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
+        User user=getUserEntity(userName);
 
         Post post=postRepository.save(dto.toEntity(user));
         return PostResponse.builder()
@@ -50,10 +55,9 @@ public class PostService {
         return postResponses;
     }
 
-    public PostDto findPostById(Integer id) {
+    public PostDto findPostById(Integer postId) {
         //postId가 존재하지 않으면 POST_NOT_FOUND 예외발생
-        Post post=postRepository.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
+        Post post=getPostEntity(postId);
         return PostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -66,7 +70,8 @@ public class PostService {
 
     @Transactional
     public PostResponse modifyPost(Integer postId, PostModifyRequet dto, String userName) {
-        Post post=getPostEntity(postId, userName);
+        Post post=getPostEntity(postId);
+        matchWriterAndPost(post, getUserEntity(userName));
 
         post.updatePost(dto.getTitle(), dto.getBody());
 
@@ -77,8 +82,8 @@ public class PostService {
     }
 
     public PostResponse deletePost(Integer postId, String userName) {
-        Post post=getPostEntity(postId, userName);
-
+        Post post=getPostEntity(postId);
+        matchWriterAndPost(post, getUserEntity(userName));
         postRepository.deleteById(postId);
         return PostResponse.builder()
                 .message(POST_DELETE_SUCCESS)
@@ -86,9 +91,7 @@ public class PostService {
                 .build();
     }
     public Page<CommentDto> getCommentList(Integer postId, Pageable pageable) {
-        //postId 유효한지 확인
-        Post post=postRepository.findById(postId)
-                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, "해당 페이지가 존재하지 않습니다."));
+        Post post=getPostEntity(postId);
 
         Page<Comment> comments=commentRepository.findByPost(pageable, post);
         Page<CommentDto> commentDtos=CommentDto.toList(comments);
@@ -96,12 +99,9 @@ public class PostService {
     }
 
     public CommentDto writeComment(Integer postId, CommentWriteRequest dto, String userName) {
-        //존재하는 post인지 확인
-        Post post=postRepository.findById(postId)
-                .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
+        Post post=getPostEntity(postId);
+        User user=getUserEntity(userName);
 
-        User user=userRepository.findByUserName(userName)
-                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
         Comment comment=commentRepository.save(dto.toEntity(user, post));
 
         return CommentDto.builder()
@@ -116,7 +116,9 @@ public class PostService {
 
     @Transactional
     public CommentDto modifyComment(Long commentId, CommentModifyRequest dto, String userName) {
-        Comment comment=getCommentEntity(commentId, userName);
+        Comment comment=getCommentEntity(commentId);
+
+        matchWriterAndComment(comment, getUserEntity(userName));
 
         comment.updateComment(dto.getComment());
 
@@ -131,48 +133,54 @@ public class PostService {
     }
 
     public CommentDeleteResponse deleteComment(Long commentId, String userName) {
-        Comment comment=getCommentEntity(commentId, userName);
-
+        Comment comment=getCommentEntity(commentId);
+        matchWriterAndComment(comment, getUserEntity(userName));
         commentRepository.deleteById(commentId);
         return CommentDeleteResponse.builder()
                 .message(COMMENT_DELETE_SUCCESS)
                 .id(comment.getId())
                 .build();
     }
-    private Post getPostEntity(Integer postId, String userName){
+    public LikeResponse like(Integer postId, String userName) {
+        Post post=getPostEntity(postId);
+        User user=getUserEntity(userName);
+        likeRepository.findByPostAndUser(post, user)
+                .ifPresent(like->{
+                    throw new AppException(ErrorCode.DUPLICATED_LIKE, ErrorCode.DUPLICATED_LIKE.getMessage());
+                });
+        likeRepository.save(Like.of(post, user));
+        return LikeResponse.builder()
+                .message("좋아요를 눌렀습니다.")
+                .build();
+    }
+    private Post getPostEntity(Integer postId){
         //존재하는 Post인지 확인
         Post post=postRepository.findById(postId)
                 .orElseThrow(()->new AppException(ErrorCode.POST_NOT_FOUND, String.format("해당 포스트가 존재하지 않습니다.")));
-        validatePostPermission(post, userName);
 
         return post;
     }
-    private boolean validatePostPermission(Post post, String userName){
+    private Comment getCommentEntity(Long commentId){
+        //존재하는 Post인지 확인
+        Comment comment=commentRepository.findById(commentId)
+                .orElseThrow(()->new AppException(ErrorCode.COMMENT_NOT_FOUND, String.format("해당 댓글이 존재하지 않습니다.")));
+
+        return comment;
+    }
+    private User getUserEntity(String userName){
         //존재하는 유저인지 확인
         User user=userRepository.findByUserName(userName)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
-        //post 작성자와 유저가 일치하는지 확인
-        //현재 유저의 권한이 ADMIN이 아닌지 확인
-        if(user.getId()!=post.getUser().getId() && user.getRole()!=UserRole.ADMIN){
-            throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 포스트 접근 권한이 없습니다.", user.getUserName()));
+
+        return user;
+    }
+    private boolean matchWriterAndPost(Post post, User user){
+        if(user.getId()!=post.getUser().getId() && user.getRole() != UserRole.ADMIN){
+            throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 post 접근 권한이 없습니다.", user.getUserName()));
         }
         return true;
     }
-    private Comment getCommentEntity(Long commentId, String userName){
-        //존재하는 comment인지 확인
-        Comment comment=commentRepository.findById(commentId)
-                .orElseThrow(()->new AppException(ErrorCode.COMMENT_NOT_FOUND, String.format("해당 comment가 존재하지 않습니다.")));
-
-        validateCommentPermission(comment, userName);
-        return comment;
-    }
-    private boolean validateCommentPermission(Comment comment, String userName){
-        //존재하는 유저인지 확인
-        User user=userRepository.findByUserName(userName)
-                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s이 존재하지 않습니다.", userName)));
-
-        //댓글 작성자와 유저가 일치하는지 확인
-        //현재 유저의 권한이 ADMIN이 아닌지 확인
+    private boolean matchWriterAndComment(Comment comment, User user){
         if(user.getId()!=comment.getUser().getId() && user.getRole() != UserRole.ADMIN){
             throw new AppException(ErrorCode.INVALID_PERMISSION, String.format("user %s는 해당 comment 접근 권한이 없습니다.", user.getUserName()));
         }

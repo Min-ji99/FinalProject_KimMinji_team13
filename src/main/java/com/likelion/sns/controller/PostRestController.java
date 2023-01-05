@@ -70,4 +70,9 @@ public class PostRestController {
         Page<CommentDto> commentDtos=postService.getCommentList(postId, pageable);
         return Response.success(commentDtos);
     }
+    @PostMapping("/{postId}/likes")
+    public Response<LikeResponse> like(@PathVariable Integer postId, Authentication authentication){
+        LikeResponse likeResponse=postService.like(postId, authentication.getName());
+        return Response.success(likeResponse);
+    }
 }
