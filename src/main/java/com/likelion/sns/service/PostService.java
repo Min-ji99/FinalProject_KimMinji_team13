@@ -81,10 +81,12 @@ public class PostService {
                 .postId(post.getId())
                 .build();
     }
-
+    @Transactional
     public PostResponse deletePost(Integer postId, String userName) {
         Post post=getPostEntity(postId);
         matchWriterAndPost(post, getUserEntity(userName));
+        likeRepository.deleteAllByPost(post);
+        commentRepository.deleteAllByPost(post);
         postRepository.deleteById(postId);
         return PostResponse.builder()
                 .message(POST_DELETE_SUCCESS)
