@@ -27,6 +27,7 @@ public class SecurityConfiguration {
     private final String[] PERMIT_URL={"/api/v1/hello/**", "/api/v1/users/join", "/api/v1/users/login"};
     private final String ADMIN_PERMIT_URL="/api/v1/users/**/role/change";
     private final String PERMIT_GET_URL="/api/v1/posts/**";
+    private final String MY_FEED_URL="/api/v1/posts/my";
     private final String ROLE_ADMIN="ADMIN";
 
 
@@ -40,6 +41,8 @@ public class SecurityConfiguration {
                 .authorizeRequests()
                 .antMatchers(SWAGGER_PERMIT_URL).permitAll()
                 .antMatchers(PERMIT_URL).permitAll()
+                //마이피드 조회는 로그인 필요
+                .antMatchers(HttpMethod.GET, MY_FEED_URL).authenticated()
                 .antMatchers(HttpMethod.GET, PERMIT_GET_URL).permitAll()
                 // /api/v1/users/*/role/change 요청에 대해서는 ADMIN만 가능
                 .antMatchers(ADMIN_PERMIT_URL).hasAuthority(ROLE_ADMIN)
