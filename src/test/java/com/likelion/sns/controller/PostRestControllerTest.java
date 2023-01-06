@@ -50,6 +50,9 @@ class PostRestControllerTest {
     private final String BODY="body";
     private final String MODIFY_TITLE="modify title";
     private final String MODIFY_BODY="modify body";
+    private final String POST_GET_WRITE_URL="/api/v1/posts";
+    private final String POST_MODIFY_DELETE_URL="/api/v1/posts/"+POST_ID;
+    private final String MY_FEED_URL="/api/v1/posts/my";
 
     private final PostWriteRequest POST_WRITE_REQUEST=PostWriteRequest.builder()
             .title(TITLE)
@@ -78,7 +81,7 @@ class PostRestControllerTest {
     void write_success() throws Exception {
         when(postService.writePost(any(), any())).thenReturn(POST_RESPONSE);
 
-        mockMvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post(POST_GET_WRITE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_WRITE_REQUEST)))
@@ -93,7 +96,7 @@ class PostRestControllerTest {
     void write_fail() throws Exception {
         when(postService.writePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
-        mockMvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post(POST_GET_WRITE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_WRITE_REQUEST)))
@@ -106,7 +109,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 리스트 조회 - createdAt 기준으로 정렬되어있는지 확인")
     @WithMockUser
     void getPostList() throws Exception{
-        mockMvc.perform(get("/api/v1/posts")
+        mockMvc.perform(get(POST_GET_WRITE_URL)
                         .param("page", "0")
                         .param("size", "20")
                         .param("sort", "createdAt,desc"))
@@ -125,7 +128,7 @@ class PostRestControllerTest {
     void getPostById_success() throws Exception{
         when(postService.findPostById(any())).thenReturn(POST_DTO);
 
-        mockMvc.perform(get("/api/v1/posts/1")
+        mockMvc.perform(get(POST_MODIFY_DELETE_URL)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -146,7 +149,7 @@ class PostRestControllerTest {
                 .build();
         when(postService.modifyPost(any(), any(), any())).thenReturn(postResponse);
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
@@ -161,7 +164,7 @@ class PostRestControllerTest {
     void modify_fail1() throws Exception {
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
@@ -174,7 +177,7 @@ class PostRestControllerTest {
     void modify_fail2() throws Exception {
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND, ""));
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
@@ -187,7 +190,7 @@ class PostRestControllerTest {
     void modify_fail3() throws Exception {
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
@@ -200,7 +203,7 @@ class PostRestControllerTest {
     void modify_fail4() throws Exception {
         when(postService.modifyPost(any(), any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(POST_MODIFY_REQUEST)))
@@ -217,7 +220,7 @@ class PostRestControllerTest {
                 .build();
         when(postService.deletePost(any(), any())).thenReturn(postResponse);
 
-        mockMvc.perform(delete("/api/v1/posts/1")
+        mockMvc.perform(delete(POST_MODIFY_DELETE_URL)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -230,7 +233,7 @@ class PostRestControllerTest {
     void delete_fail1() throws Exception {
         when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
-        mockMvc.perform(delete("/api/v1/posts/1")
+        mockMvc.perform(delete(POST_MODIFY_DELETE_URL)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -241,7 +244,7 @@ class PostRestControllerTest {
     void delete_fail2() throws Exception {
         when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION, ""));
 
-        mockMvc.perform(delete("/api/v1/posts/1")
+        mockMvc.perform(delete(POST_MODIFY_DELETE_URL)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -252,9 +255,38 @@ class PostRestControllerTest {
     void delete_fail3() throws Exception {
         when(postService.deletePost(any(), any())).thenThrow(new AppException(ErrorCode.DATABASE_ERROR, ""));
 
-        mockMvc.perform(put("/api/v1/posts/1")
+        mockMvc.perform(put(POST_MODIFY_DELETE_URL)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
+    }
+    @Test
+    @DisplayName("마이피드 조회 성공")
+    @WithMockUser
+    void myFeed_success() throws Exception{
+        mockMvc.perform(get(MY_FEED_URL)
+                        .param("page", "0")
+                        .param("size", "20")
+                        .param("sort", "createdAt,desc")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+        ArgumentCaptor<Pageable> pageableArgumentCaptor=ArgumentCaptor.forClass(Pageable.class);
+
+        verify(postService).getMyFeed(any(), pageableArgumentCaptor.capture());
+        PageRequest pageRequest=(PageRequest) pageableArgumentCaptor.getValue();
+
+        assertEquals(Sort.by("createdAt", "desc"), pageRequest.withSort(Sort.by("createdAt", "desc")).getSort());
+    }
+    @Test
+    @DisplayName("마이피드 조회 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    void myFeed_fail1() throws Exception {
+        when(postService.getMyFeed(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_TOKEN, ""));
+
+        mockMvc.perform(get(MY_FEED_URL)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 }
