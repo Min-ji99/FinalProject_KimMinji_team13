@@ -81,4 +81,11 @@ public class PostRestController {
 
         return Response.success(likeCount);
     }
+    @GetMapping("/my")
+    public Response<Page<PostDto>> myFeed(@PageableDefault(size=20)
+                                              @SortDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable,
+                                          @ApiIgnore Authentication authentication){
+        Page<PostDto> feed=postService.getMyFeed(authentication.getName(), pageable);
+        return Response.success(feed);
+    }
 }

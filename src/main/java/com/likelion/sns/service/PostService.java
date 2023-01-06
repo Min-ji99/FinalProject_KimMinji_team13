@@ -162,6 +162,11 @@ public class PostService {
         Long likeCnt=likeRepository.countByPost(post);
         return likeCnt;
     }
+    public Page<PostDto> getMyFeed(String userName, Pageable pageable) {
+        User user=getUserEntity(userName);
+        Page<Post> feed=postRepository.findByUser(user, pageable);
+        return PostDto.toList(feed);
+    }
     private Post getPostEntity(Integer postId){
         //존재하는 Post인지 확인
         Post post=postRepository.findById(postId)
