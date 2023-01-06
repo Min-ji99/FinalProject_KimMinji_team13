@@ -1,6 +1,14 @@
 package com.likelion.sns.controller;
 
 import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.dto.comment.CommentDeleteResponse;
+import com.likelion.sns.domain.dto.comment.CommentDto;
+import com.likelion.sns.domain.dto.comment.CommentModifyRequest;
+import com.likelion.sns.domain.dto.comment.CommentWriteRequest;
+import com.likelion.sns.domain.dto.post.PostDto;
+import com.likelion.sns.domain.dto.post.PostModifyRequet;
+import com.likelion.sns.domain.dto.post.PostResponse;
+import com.likelion.sns.domain.dto.post.PostWriteRequest;
 import com.likelion.sns.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -48,38 +56,6 @@ public class PostRestController {
     public Response<PostResponse> delete(@PathVariable Integer id, @ApiIgnore Authentication authentication){
         PostResponse postResponse=postService.deletePost(id, authentication.getName());
         return Response.success(postResponse);
-    }
-    @PostMapping("/{postId}/comments")
-    public Response<CommentDto> writeComment(@PathVariable Integer postId, @ApiIgnore Authentication authentication, @RequestBody CommentWriteRequest dto){
-        CommentDto commentDto =postService.writeComment(postId, dto, authentication.getName());
-        return Response.success(commentDto);
-    }
-    @PutMapping("/{postId}/comments/{id}")
-    public Response<CommentDto> modifyComment(@PathVariable Long id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
-        CommentDto commentDto =postService.modifyComment(id, dto, authentication.getName());
-        return Response.success(commentDto);
-    }
-    @DeleteMapping("/{postId}/comments/{id}")
-    public Response<CommentDeleteResponse> deleteComment(@PathVariable Long id, @ApiIgnore Authentication authentication){
-        CommentDeleteResponse commentDeleteResponse =postService.deleteComment(id, authentication.getName());
-        return Response.success(commentDeleteResponse);
-    }
-    @GetMapping("/{postId}/comments")
-    public Response<Page<CommentDto>> getCommentList(@PageableDefault(size=10)
-                                               @SortDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable, @PathVariable Integer postId){
-        Page<CommentDto> commentDtos=postService.getCommentList(postId, pageable);
-        return Response.success(commentDtos);
-    }
-    @PostMapping("/{postId}/likes")
-    public Response<String> like(@PathVariable Integer postId, Authentication authentication){
-        String likeResponse=postService.like(postId, authentication.getName());
-        return Response.success(likeResponse);
-    }
-    @GetMapping("/{postId}/likes")
-    public Response<Long> likeCount(@PathVariable Integer postId){
-        Long likeCount=postService.likeCount(postId);
-
-        return Response.success(likeCount);
     }
     @GetMapping("/my")
     public Response<Page<PostDto>> myFeed(@PageableDefault(size=20)

@@ -1,6 +1,7 @@
 package com.likelion.sns.controller;
 
 import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.dto.user.*;
 import com.likelion.sns.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

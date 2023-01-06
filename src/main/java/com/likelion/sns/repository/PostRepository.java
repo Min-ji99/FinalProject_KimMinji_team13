@@ -1,6 +1,5 @@
 package com.likelion.sns.repository;
 
-import com.likelion.sns.domain.dto.PostDto;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import org.springframework.data.domain.Page;

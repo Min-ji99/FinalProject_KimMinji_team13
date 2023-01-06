@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CommentModifyRequest {
-    private String comment;
+public class UserJoinResponse {
+    private Integer userId;
+    private String userName;
 }

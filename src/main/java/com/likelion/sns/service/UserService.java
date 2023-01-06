@@ -1,6 +1,6 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.dto.user.*;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;

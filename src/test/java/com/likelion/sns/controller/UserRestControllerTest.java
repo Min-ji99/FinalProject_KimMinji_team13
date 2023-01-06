@@ -1,7 +1,7 @@
 package com.likelion.sns.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.likelion.sns.domain.dto.*;
+import com.likelion.sns.domain.dto.user.*;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;
@@ -10,18 +10,12 @@ import com.likelion.sns.service.UserService;
 import com.likelion.sns.utils.JwtTokenUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

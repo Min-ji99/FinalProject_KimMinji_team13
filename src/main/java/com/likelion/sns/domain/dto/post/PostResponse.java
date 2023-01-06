@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserRoleChangeRequest {
-    private String role;
+public class PostResponse {
+    private String message;
+    private Integer postId;
 }

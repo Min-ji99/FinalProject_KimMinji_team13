@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.user;
 
 import com.likelion.sns.enums.UserRole;
 import lombok.AllArgsConstructor;

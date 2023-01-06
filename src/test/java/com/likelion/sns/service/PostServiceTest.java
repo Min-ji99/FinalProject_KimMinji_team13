@@ -1,9 +1,9 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.PostDto;
-import com.likelion.sns.domain.dto.PostModifyRequet;
-import com.likelion.sns.domain.dto.PostWriteRequest;
-import com.likelion.sns.domain.dto.PostResponse;
+import com.likelion.sns.domain.dto.post.PostDto;
+import com.likelion.sns.domain.dto.post.PostModifyRequet;
+import com.likelion.sns.domain.dto.post.PostWriteRequest;
+import com.likelion.sns.domain.dto.post.PostResponse;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;

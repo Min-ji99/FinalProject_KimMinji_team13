@@ -1,15 +1,15 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class PostResponse {
+public class CommentDeleteResponse {
+    private Long id;
     private String message;
-    private Integer postId;
 }
