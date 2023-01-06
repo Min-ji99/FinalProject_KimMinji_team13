@@ -12,9 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -22,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +41,9 @@ class PostRestControllerTest {
     PostService postService;
     private final Integer POST_ID=1;
     private final Long COMMENT_ID=1l;
-    private final String COMMENT="댓글 작성";
+    private final Long COMMENT_ID2=2l;
+    private final String COMMENT1="댓글 작성1";
+    private final String COMMENT2="댓글 작성2";
     private final String MODIFY_COMMENT="댓글 수정";
     private final String DELETE_COMMENT="댓글 삭제 완료";
     private final String LIKE_RESPONSE="좋아요를 눌렀습니다.";
@@ -50,6 +51,7 @@ class PostRestControllerTest {
     private final String COMMENT_GET_WRITE_URL="/api/v1/posts/"+POST_ID+"/comments";
     private final String COMMENT_MODIFY_DELETE_URL="/api/v1/posts/"+POST_ID+"/comments/"+COMMENT_ID;
     private final String LIKE_URL="/api/v1/posts/"+POST_ID+"/likes";
+    private final Pageable pageable=PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
     private final PostWriteRequest POST_WRITE_REQUEST=PostWriteRequest.builder()
             .title("title")
@@ -73,14 +75,24 @@ class PostRestControllerTest {
             .lastModifiedAt(LocalDateTime.now())
             .build();
     private final CommentWriteRequest COMMENT_WRITE_REQUEST=CommentWriteRequest.builder()
-            .comment(COMMENT)
+            .comment(COMMENT1)
             .build();
 
     private final CommentDto COMMENT_DTO= CommentDto.builder()
             .id(COMMENT_ID)
-            .comment(COMMENT)
+            .comment(COMMENT1)
             .userName(userName)
             .postId(POST_ID)
+            .createdAt(LocalDateTime.of(2023, 1, 6, 12, 13, 50))
+            .lastModifiedAt(LocalDateTime.of(2023, 1, 6, 12, 13, 50))
+            .build();
+    private final CommentDto COMMENT_DTO2= CommentDto.builder()
+            .id(COMMENT_ID2)
+            .comment(COMMENT2)
+            .userName(userName)
+            .postId(POST_ID)
+            .createdAt(LocalDateTime.of(2023, 1, 5, 12, 13, 50))
+            .lastModifiedAt(LocalDateTime.of(2023, 1, 5, 12, 13, 50))
             .build();
     private final CommentDto COMMENT_MODIFY_DTO= CommentDto.builder()
             .id(COMMENT_ID)
@@ -283,22 +295,20 @@ class PostRestControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    /*@Test
+    @Test
     @DisplayName("댓글 목록 조회 성공")
     @WithMockUser
     void getCommentList() throws Exception{
-        when(postService.writePost(any(), any())).thenReturn(POST_RESPONSE);
-        when(postService.writeComment(any(), any(), any())).thenReturn(COMMENT_DTO);
+        Page<CommentDto> commentPage=new PageImpl<>(List.of(COMMENT_DTO, COMMENT_DTO2));
+        when(postService.getCommentList(POST_ID, pageable)).thenReturn(commentPage);
         mockMvc.perform(get(COMMENT_GET_WRITE_URL))
                 .andDo(print())
-                .andExpect(status().isOk());
-        ArgumentCaptor<Pageable> pageableArgumentCaptor=ArgumentCaptor.forClass(Pageable.class);
-
-        verify(postService).getCommentList(POST_ID, pageableArgumentCaptor.capture());
-        PageRequest pageRequest=(PageRequest) pageableArgumentCaptor.getValue();
-
-        assertEquals(Sort.by("createdAt", "desc"), pageRequest.withSort(Sort.by("createdAt", "desc")).getSort());
-    }*/
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.content").exists())
+                .andExpect(jsonPath("$.result.content[0].comment").value(COMMENT1))
+                .andExpect(jsonPath("$.result.content[0].postId").value(POST_ID))
+                .andExpect(jsonPath("$.result.content[1].comment").value(COMMENT2));
+    }
     @Test
     @DisplayName("댓글 작성 성공")
     @WithMockUser
@@ -311,7 +321,7 @@ class PostRestControllerTest {
                         .content(objectMapper.writeValueAsBytes(COMMENT_WRITE_REQUEST)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result.comment").value(COMMENT))
+                .andExpect(jsonPath("$.result.comment").value(COMMENT1))
                 .andExpect(jsonPath("$.result.postId").exists());
     }
     @Test
