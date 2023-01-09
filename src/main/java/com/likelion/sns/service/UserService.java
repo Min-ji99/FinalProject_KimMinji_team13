@@ -9,6 +9,7 @@ import com.likelion.sns.repository.UserRepository;
 import com.likelion.sns.utils.JwtTokenUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -20,7 +21,7 @@ public class UserService {
         this.encoder = encoder;
         this.jwtTokenUtil = jwtTokenUtil;
     }
-
+    @Transactional
     public UserJoinResponse join(UserJoinRequest dto) {
         validateDuplicateUser(dto.getUserName());
 
@@ -45,12 +46,7 @@ public class UserService {
                 .build();
     }
 
-    public User getUsername(String userName) {
-        User user=userRepository.findByUserName(userName)
-                .orElseThrow(()-> new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s가 존재하지 않습니다.", userName)));
-        return user;
-    }
-
+    @Transactional
     public UserRoleChangeResponse changeRole(UserRoleChangeRequest dto, Integer id, String adminUserName) {
         //admin 사용자가 존재하는지 확인
         User admin=getUserEntityByUsername(adminUserName);

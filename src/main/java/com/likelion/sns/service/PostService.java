@@ -41,6 +41,7 @@ public class PostService {
         this.likeRepository = likeRepository;
     }
 
+    @Transactional
     public PostResponse writePost(PostWriteRequest dto, String userName) {
         //userName이 존재하지 않으면 USERNAME_NOT_FOUND 예외 발생
         User user=getUserEntity(userName);
