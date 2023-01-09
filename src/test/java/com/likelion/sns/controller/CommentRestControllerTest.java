@@ -41,8 +41,8 @@ class CommentRestControllerTest {
     CommentService commentService;
 
     private final Integer POST_ID=1;
-    private final Long COMMENT_ID=1l;
-    private final Long COMMENT_ID2=2l;
+    private final Integer COMMENT_ID=1;
+    private final Integer COMMENT_ID2=2;
     private final String COMMENT1="댓글 작성1";
     private final String COMMENT2="댓글 작성2";
     private final String MODIFY_COMMENT="댓글 수정";

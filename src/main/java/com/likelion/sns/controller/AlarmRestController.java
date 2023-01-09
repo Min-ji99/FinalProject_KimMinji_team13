@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/alarms")
+@RequestMapping("/api/v1/alarms")
 public class AlarmRestController {
     private final AlarmService alarmService;
 
@@ -24,7 +24,7 @@ public class AlarmRestController {
     }
     @GetMapping
     public Response<Page<AlarmResponse>> getAlarmList(@ApiIgnore Authentication authentication,
-                                                      @PageableDefault(size=10)
+                                                      @PageableDefault(size=20)
                                                       @SortDefault(sort="createdAt", direction= Sort.Direction.DESC) Pageable pageable){
         Page<AlarmResponse> alarms=alarmService.getAlarmList(pageable, authentication.getName());
         return Response.success(alarms);
