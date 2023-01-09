@@ -1,5 +1,6 @@
 package com.likelion.sns.domain.dto.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.likelion.sns.domain.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,9 @@ public class CommentDto {
     private String comment;
     private String userName;
     private Integer postId;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy/dd/mm hh:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy/dd/mm hh:mm:ss")
     private LocalDateTime lastModifiedAt;
 
     public static Page<CommentDto> toList(Page<Comment> commentEntities) {
