@@ -54,7 +54,7 @@ public class UserService {
         User user=userRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("userId %d이 존재하지 않습니다.", id)));
 
-        user.setRole(UserRole.of(dto.getRole()));
+        user.updateRole(UserRole.of(dto.getRole()));
         User savedUser=userRepository.save(user);
         return UserRoleChangeResponse.builder()
                 .userId(savedUser.getId())
