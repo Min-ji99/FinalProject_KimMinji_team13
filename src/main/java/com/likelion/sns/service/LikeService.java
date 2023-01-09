@@ -1,8 +1,10 @@
 package com.likelion.sns.service;
 
+import com.likelion.sns.domain.entity.Alarm;
 import com.likelion.sns.domain.entity.Like;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
+import com.likelion.sns.enums.AlarmType;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.exception.AppException;
 import com.likelion.sns.repository.LikeRepository;
@@ -17,11 +19,13 @@ public class LikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final AlarmService alarmService;
 
-    public LikeService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public LikeService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository, AlarmService alarmService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
+        this.alarmService = alarmService;
     }
 
     @Transactional
@@ -33,6 +37,11 @@ public class LikeService {
                     throw new AppException(ErrorCode.DUPLICATED_LIKE, ErrorCode.DUPLICATED_LIKE.getMessage());
                 });
         likeRepository.save(Like.of(post, user));
+        if(user.getId()!=post.getUser().getId()){
+            Alarm alarm= Alarm.createAlarm(AlarmType.NEW_LIKE_ON_POST, user, post);
+            alarmService.saveAlarm(alarm);
+
+        }
         return LIKE_SUCCESS;
     }
     public Long likeCount(Integer postId) {

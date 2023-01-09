@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDeleteResponse {
-    private Long id;
+    private Integer id;
     private String message;
 }

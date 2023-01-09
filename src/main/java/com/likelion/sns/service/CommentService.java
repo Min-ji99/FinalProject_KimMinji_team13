@@ -4,9 +4,11 @@ import com.likelion.sns.domain.dto.comment.CommentDeleteResponse;
 import com.likelion.sns.domain.dto.comment.CommentDto;
 import com.likelion.sns.domain.dto.comment.CommentModifyRequest;
 import com.likelion.sns.domain.dto.comment.CommentWriteRequest;
+import com.likelion.sns.domain.entity.Alarm;
 import com.likelion.sns.domain.entity.Comment;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
+import com.likelion.sns.enums.AlarmType;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;
 import com.likelion.sns.exception.AppException;
@@ -24,11 +26,13 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final AlarmService alarmService;
 
-    public CommentService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
+    public CommentService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, AlarmService alarmService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.alarmService = alarmService;
     }
 
     public Page<CommentDto> getCommentList(Integer postId, Pageable pageable) {
@@ -44,7 +48,10 @@ public class CommentService {
         User user=getUserEntity(userName);
 
         Comment comment=commentRepository.save(dto.toEntity(user, post));
-
+        if(user.getId()!=post.getUser().getId()){
+            Alarm alarm=Alarm.createAlarm(AlarmType.NEW_COMMENT_ON_POST, user, post);
+            alarmService.saveAlarm(alarm);
+        }
         return CommentDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
@@ -56,7 +63,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDto modifyComment(Long commentId, CommentModifyRequest dto, String userName) {
+    public CommentDto modifyComment(Integer commentId, CommentModifyRequest dto, String userName) {
         Comment comment=getCommentEntity(commentId);
 
         matchWriterAndComment(comment, getUserEntity(userName));
@@ -73,7 +80,7 @@ public class CommentService {
                 .build();
     }
 
-    public CommentDeleteResponse deleteComment(Long commentId, String userName) {
+    public CommentDeleteResponse deleteComment(Integer commentId, String userName) {
         Comment comment=getCommentEntity(commentId);
         matchWriterAndComment(comment, getUserEntity(userName));
         commentRepository.deleteById(commentId);
@@ -89,7 +96,7 @@ public class CommentService {
 
         return post;
     }
-    private Comment getCommentEntity(Long commentId){
+    private Comment getCommentEntity(Integer commentId){
         //존재하는 Post인지 확인
         Comment comment=commentRepository.findById(commentId)
                 .orElseThrow(()->new AppException(ErrorCode.COMMENT_NOT_FOUND, String.format("해당 댓글이 존재하지 않습니다.")));
