@@ -52,14 +52,7 @@ public class CommentService {
             Alarm alarm=Alarm.createAlarm(AlarmType.NEW_COMMENT_ON_POST, user, post);
             alarmService.saveAlarm(alarm);
         }
-        return CommentDto.builder()
-                .id(comment.getId())
-                .postId(comment.getPost().getId())
-                .userName(comment.getUser().getUserName())
-                .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt())
-                .lastModifiedAt(comment.getLastModifiedAt())
-                .build();
+        return CommentDto.from(comment);
     }
 
     @Transactional
@@ -70,14 +63,7 @@ public class CommentService {
 
         comment.updateComment(dto.getComment());
 
-        return CommentDto.builder()
-                .id(comment.getId())
-                .postId(comment.getPost().getId())
-                .userName(comment.getUser().getUserName())
-                .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt())
-                .lastModifiedAt(comment.getLastModifiedAt())
-                .build();
+        return CommentDto.from(comment);
     }
 
     public CommentDeleteResponse deleteComment(Integer commentId, String userName) {

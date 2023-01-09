@@ -13,17 +13,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AlarmService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final AlarmRepository alarmRepository;
 
-    public AlarmService(UserRepository userRepository, AlarmRepository alarmRepository) {
-        this.userRepository = userRepository;
+    public AlarmService(UserService userService, AlarmRepository alarmRepository) {
+        this.userService = userService;
         this.alarmRepository = alarmRepository;
     }
 
     public Page<AlarmResponse> getAlarmList(Pageable pageable, String userName) {
-        User user=userRepository.findByUserName(userName)
-                .orElseThrow(()->new AppException(ErrorCode.USERNAME_NOT_FOUND, String.format("username %s가 존재하지 않습니다.", userName)));
+        User user=userService.getUserEntityByUsername(userName);
         Page<AlarmResponse> alarmResponses=AlarmResponse.toList(alarmRepository.findAllByUser(user, pageable));
 
         return alarmResponses;

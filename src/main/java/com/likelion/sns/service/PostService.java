@@ -62,14 +62,7 @@ public class PostService {
     public PostDto findPostById(Integer postId) {
         //postId가 존재하지 않으면 POST_NOT_FOUND 예외발생
         Post post=getPostEntity(postId);
-        return PostDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .body(post.getBody())
-                .userName(post.getUser().getUserName())
-                .createdAt(post.getCreatedAt())
-                .lastModifiedAt(post.getLastModifiedAt())
-                .build();
+        return PostDto.from(post);
     }
 
     @Transactional
