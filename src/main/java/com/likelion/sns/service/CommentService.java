@@ -42,7 +42,7 @@ public class CommentService {
         Page<CommentDto> commentDtos=CommentDto.toList(comments);
         return commentDtos;
     }
-
+    @Transactional
     public CommentDto writeComment(Integer postId, CommentWriteRequest dto, String userName) {
         Post post=getPostEntity(postId);
         User user=getUserEntity(userName);
@@ -65,7 +65,7 @@ public class CommentService {
 
         return CommentDto.from(comment);
     }
-
+    @Transactional
     public CommentDeleteResponse deleteComment(Integer commentId, String userName) {
         Comment comment=getCommentEntity(commentId);
         matchWriterAndComment(comment, getUserEntity(userName));
