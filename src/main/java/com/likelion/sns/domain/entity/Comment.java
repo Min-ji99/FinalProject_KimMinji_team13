@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Comment extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String comment;
 
     @ManyToOne

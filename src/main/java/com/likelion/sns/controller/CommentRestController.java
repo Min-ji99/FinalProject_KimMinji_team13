@@ -32,12 +32,12 @@ public class CommentRestController {
         return Response.success(commentDto);
     }
     @PutMapping("/{postId}/comments/{id}")
-    public Response<CommentDto> modifyComment(@PathVariable Long id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
+    public Response<CommentDto> modifyComment(@PathVariable Integer id, @ApiIgnore Authentication authentication, @RequestBody CommentModifyRequest dto){
         CommentDto commentDto =commentService.modifyComment(id, dto, authentication.getName());
         return Response.success(commentDto);
     }
     @DeleteMapping("/{postId}/comments/{id}")
-    public Response<CommentDeleteResponse> deleteComment(@PathVariable Long id, @ApiIgnore Authentication authentication){
+    public Response<CommentDeleteResponse> deleteComment(@PathVariable Integer id, @ApiIgnore Authentication authentication){
         CommentDeleteResponse commentDeleteResponse =commentService.deleteComment(id, authentication.getName());
         return Response.success(commentDeleteResponse);
     }
