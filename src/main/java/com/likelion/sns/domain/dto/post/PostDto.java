@@ -36,4 +36,14 @@ public class PostDto {
 
         return posts;
     }
+    public static PostDto from(Post post){
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .body(post.getBody())
+                .userName(post.getUser().getUserName())
+                .createdAt(post.getCreatedAt())
+                .lastModifiedAt(post.getLastModifiedAt())
+                .build();
+    }
 }

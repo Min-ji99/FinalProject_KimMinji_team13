@@ -34,4 +34,14 @@ public class CommentDto {
                 .lastModifiedAt(entity.getLastModifiedAt())
                 .build());
     }
+    public static CommentDto from(Comment comment){
+        return CommentDto.builder()
+                .id(comment.getId())
+                .postId(comment.getPost().getId())
+                .userName(comment.getUser().getUserName())
+                .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt())
+                .lastModifiedAt(comment.getLastModifiedAt())
+                .build();
+    }
 }
