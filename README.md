@@ -1,5 +1,15 @@
 # MutsaSNS
-> ## 미션 요구사항 분석 & 체크리스트
+SpringBoot+Jwt+JPA를 이용한 SNS
+
+## 개발 환경
+- **Java 11**
+- **Framework** : Springboot 2.7.5
+- **Build** : Gradle 7.5.1
+- **DB** : MySQL 8.0
+- **Sever** : AWS EC2
+- 그 외 라이프러리 : SpringBoot Web, MySQL, Spring Data JPA, Lombok, Spring Security, JWT, Swagger
+
+## 미션 요구사항 분석 & 체크리스트
 ### 기능목록
 **필수**
 - [x] AWS EC2에 Docker로 배포
@@ -354,3 +364,20 @@ http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
     }
   }
   ```
+
+> ### 1주차 미션 요약
+[신경쓴 부분]
+Security를 적용하는 부분을 신경을 많이 썼다. 인증과 인가를 구현하기는 했지만 토큰이 없거나 잘못되었을 때 ErrorCode를 Response로 전달하는 방법에 대해서 찾아보고 적용하는 부분에서 많은 시간을 썼다. 
+처음 CI/CD를 구현할 때
+
+[개선할 점]
+하드 코딩된 값을 상수화하여 사용하고 Post에서 해당 포스트가 존재하는 찾는 코드가 중복되는데 이 부분을 분리하여 재사용하도록 수정하면 코드가 더 깔끔할 것 같다. 
+
+[궁금한 점]
+- 포스트 리스트를 조회할 때 정렬이 되었는지 확인하는 테스트 코드를 어떻게 작생하야하는가
+- CI/CD를 브랜치에서도 적용하고 싶다
+
+> ### 2주차 미션 요약
+[신경쓴 부분]
+- Service에서 중복해서 사용되는 기능들은 메서드로 분리해서 사용하도록 했다. 
+- 엔티티를 수정해야할 때 Setter 방식 대신 엔티티 내부에서 수정하도록 구현했다.
