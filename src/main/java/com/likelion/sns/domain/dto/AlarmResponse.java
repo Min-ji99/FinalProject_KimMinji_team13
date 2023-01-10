@@ -1,9 +1,7 @@
 package com.likelion.sns.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.likelion.sns.domain.dto.post.PostDto;
 import com.likelion.sns.domain.entity.Alarm;
-import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.enums.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

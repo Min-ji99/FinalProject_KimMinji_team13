@@ -1,8 +1,6 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.post.PostResponse;
 import com.likelion.sns.domain.dto.user.UserRoleChangeRequest;
-import com.likelion.sns.domain.dto.user.UserRoleChangeResponse;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
 import com.likelion.sns.enums.UserRole;
@@ -18,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 class UserServiceTest {

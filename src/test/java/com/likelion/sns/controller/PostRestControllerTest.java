@@ -1,10 +1,6 @@
 package com.likelion.sns.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.likelion.sns.domain.dto.comment.CommentDeleteResponse;
-import com.likelion.sns.domain.dto.comment.CommentDto;
-import com.likelion.sns.domain.dto.comment.CommentModifyRequest;
-import com.likelion.sns.domain.dto.comment.CommentWriteRequest;
 import com.likelion.sns.domain.dto.post.PostDto;
 import com.likelion.sns.domain.dto.post.PostModifyRequet;
 import com.likelion.sns.domain.dto.post.PostResponse;
@@ -25,7 +21,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

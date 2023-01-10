@@ -1,15 +1,9 @@
 package com.likelion.sns.service;
 
-import com.likelion.sns.domain.dto.comment.CommentDeleteResponse;
-import com.likelion.sns.domain.dto.comment.CommentDto;
-import com.likelion.sns.domain.dto.comment.CommentModifyRequest;
-import com.likelion.sns.domain.dto.comment.CommentWriteRequest;
 import com.likelion.sns.domain.dto.post.PostDto;
 import com.likelion.sns.domain.dto.post.PostModifyRequet;
 import com.likelion.sns.domain.dto.post.PostResponse;
 import com.likelion.sns.domain.dto.post.PostWriteRequest;
-import com.likelion.sns.domain.entity.Comment;
-import com.likelion.sns.domain.entity.Like;
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;
 import com.likelion.sns.enums.ErrorCode;
