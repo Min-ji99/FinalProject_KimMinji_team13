@@ -1,17 +1,15 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentResponse {
-    private Integer id;
+@Builder
+public class UserJoinResponse {
+    private Integer userId;
     private String userName;
-    private Integer postId;
-    private String message;
 }

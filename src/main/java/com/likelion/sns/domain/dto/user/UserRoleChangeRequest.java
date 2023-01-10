@@ -1,12 +1,14 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentModifyRequest {
-    private String comment;
+@Builder
+public class UserRoleChangeRequest {
+    private String role;
 }

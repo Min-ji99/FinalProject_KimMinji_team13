@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.likelion.sns.domain.entity.Post;
@@ -6,10 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.data.domain.Page;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -37,5 +35,15 @@ public class PostDto {
                 .build());
 
         return posts;
+    }
+    public static PostDto from(Post post){
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .body(post.getBody())
+                .userName(post.getUser().getUserName())
+                .createdAt(post.getCreatedAt())
+                .lastModifiedAt(post.getLastModifiedAt())
+                .build();
     }
 }

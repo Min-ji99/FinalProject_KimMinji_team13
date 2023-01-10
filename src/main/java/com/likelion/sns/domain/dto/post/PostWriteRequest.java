@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.post;
 
 import com.likelion.sns.domain.entity.Post;
 import com.likelion.sns.domain.entity.User;

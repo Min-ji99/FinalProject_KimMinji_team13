@@ -1,4 +1,4 @@
-package com.likelion.sns.domain.dto;
+package com.likelion.sns.domain.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
