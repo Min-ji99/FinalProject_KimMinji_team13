@@ -30,9 +30,6 @@ SpringBoot+Jwt+JPA를 이용한 SNS
 - [x] ADMIN 회원이 일반 회원을 ADMIN으로 승격 시키는 기능
 - [x] ADMIN 회원이 로그인 시 자신이 쓴 글이 아닌 글을 수정, 삭제 기능
 
-## URL
-http://ec2-43-200-169-22.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
-
 ## ERD
 ![img.png](img.png)
 ## Endpoint
